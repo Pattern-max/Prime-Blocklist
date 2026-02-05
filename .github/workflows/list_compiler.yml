@@ -35,16 +35,13 @@ jobs:
           new_version=$(awk "BEGIN {printf \"%.2f\", $current_version + 0.01}")
           echo $new_version > version.txt
 
-          # Create Header
-          echo "! Title: UltimateDNSBlockList" > header.txt
+          # Create Header (不显示具体的源URL)
+          echo "! Title: NetBlocker" > header.txt
           echo "! Version: $new_version" >> header.txt
           echo "! Last modified: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> header.txt
           echo "! License: https://github.com/${{ github.repository }}/blob/main/LICENSE" >> header.txt
-          while IFS= read -r line || [ -n "$line" ]; do
-            if [ -n "$line" ]; then
-              echo "! Source: $line" >> header.txt
-            fi
-          done < sources.txt
+          # 不再循环读取sources.txt并显示源URL
+          echo "! Aggregated from multiple high-quality blocklist sources" >> header.txt
           echo "!" >> header.txt
 
           # Download and Clean
@@ -77,7 +74,7 @@ jobs:
           echo "! Count: $line_count" >> header.txt
           
           # Final Output
-          cat header.txt combined_cleaned.txt > list/UltimateDNSBlockList.txt
+          cat header.txt combined_cleaned.txt > list/NetBlocker.txt
           
           # Cleanup
           rm combined_temp.txt combined_unsorted.txt combined_cleaned.txt header.txt
@@ -87,9 +84,9 @@ jobs:
         run: |
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'actions@github.com'
-          git add list/UltimateDNSBlockList.txt version.txt
+          git add list/NetBlocker.txt version.txt
           if [[ -n $(git status -s) ]]; then
-            git commit -m "Update UltimateDNSBlockList.txt to version $(cat version.txt)"
+            git commit -m "Update NetBlocker.txt to version $(cat version.txt)"
             git push
           else
             echo "No changes to commit"
