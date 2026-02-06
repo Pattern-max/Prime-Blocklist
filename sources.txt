@@ -1,5 +1,5 @@
-https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.txt
-https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/tif.txt
+https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.mini.txt
+https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/tif.medium.txt
 https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_3_Spyware/filter.txt
 https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_4_Social/filter.txt
 https://secure.fanboy.co.nz/fanboy-annoyance.txt
