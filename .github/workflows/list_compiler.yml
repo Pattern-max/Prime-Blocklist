@@ -18,24 +18,16 @@ jobs:
         run: |
           mkdir -p list
           
-          # Increment Version
           if [ ! -f version.txt ]; then echo "0.00" > version.txt; fi
           current_version=$(cat version.txt)
           new_version=$(awk "BEGIN {printf \"%.2f\", $current_version + 0.01}")
           echo $new_version > version.txt
 
-          # ===========================================
-          # STEP 1: 下载和处理AdGuard官方白名单
-          # ===========================================
           echo "Downloading AdGuard whitelists..."
-          
-          # 下载AdGuard官方白名单 (共三个远程源)
           curl -s "https://raw.githubusercontent.com/AdguardTeam/AdGuardSDNSFilter/master/Filters/exclusions.txt" -o adguard_exclusions.txt
           curl -s "https://raw.githubusercontent.com/AdguardTeam/AdGuardSDNSFilter/master/Filters/exceptions.txt" -o adguard_exceptions.txt
           curl -s "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/BaseFilter/sections/allowlist.txt" -o adguard_base_allowlist.txt
-          
-          # 清理和提取域名规则
-          # 处理 exclusions.txt
+
           if [ -f "adguard_exclusions.txt" ]; then
             echo "Processing AdGuard exclusions..."
             grep -v -e '^!' -e '^#' adguard_exclusions.txt | \
@@ -49,7 +41,6 @@ jobs:
                 sed '/^[[:space:]]*$/d' > adguard_exclusions_clean.txt
           fi
           
-          # 处理 exceptions.txt
           if [ -f "adguard_exceptions.txt" ]; then
             echo "Processing AdGuard exceptions..."
             grep -v -e '^!' -e '^#' adguard_exceptions.txt | \
@@ -63,7 +54,6 @@ jobs:
                 sed '/^[[:space:]]*$/d' > adguard_exceptions_clean.txt
           fi
           
-          # 处理 BaseFilter allowlist.txt
           if [ -f "adguard_base_allowlist.txt" ]; then
             echo "Processing AdGuard BaseFilter allowlist..."
             grep -v -e '^!' -e '^#' adguard_base_allowlist.txt | \
@@ -76,16 +66,10 @@ jobs:
                 sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | \
                 sed '/^[[:space:]]*$/d' > adguard_base_allowlist_clean.txt
           fi
-          
-          # ===========================================
-          # STEP 2: 合并所有白名单
-          # ===========================================
+
           echo "Merging all whitelists..."
-          
-          # 创建总白名单文件
           touch total_whitelist.txt
           
-          # 依次添加AdGuard官方白名单源
           if [ -f "adguard_exclusions_clean.txt" ]; then
             cat adguard_exclusions_clean.txt >> total_whitelist.txt
             exclusion_count=$(wc -l < adguard_exclusions_clean.txt | xargs)
@@ -104,10 +88,8 @@ jobs:
             echo "Added $base_allowlist_count entries from AdGuard BaseFilter allowlist"
           fi
           
-          # 添加本地白名单（如果存在）
           if [ -f "allowlist.txt" ]; then
             echo "Adding local allowlist..."
-            # 清理本地白名单：移除注释，保留规则
             sed 's/#.*//' allowlist.txt | \
                 sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | \
                 sed '/^$/d' | \
@@ -116,7 +98,6 @@ jobs:
             echo "Added $local_count entries from local allowlist"
           fi
           
-          # 去重和排序总白名单
           if [ -s "total_whitelist.txt" ]; then
             sort -u total_whitelist.txt > total_whitelist_clean.txt
             total_whitelist_count=$(wc -l < total_whitelist_clean.txt | xargs)
@@ -125,13 +106,8 @@ jobs:
             echo "No whitelist entries found"
             touch total_whitelist_clean.txt
           fi
-          
-          # ===========================================
-          # STEP 3: 下载和处理主黑名单
-          # ===========================================
+
           echo "Downloading and processing blocklists..."
-          
-          # 下载源列表
           touch combined_temp.txt
           while IFS= read -r url || [ -n "$url" ]; do
             if [ -n "$url" ]; then
@@ -140,10 +116,8 @@ jobs:
             fi
           done < sources.txt
           
-          # 添加本地自定义TLD拦截规则
           if [ -f "custom_block_tld.txt" ]; then
             echo "Adding local custom TLD blocklist..."
-            # 直接将该文件内容追加到临时合并文件中
             cat custom_block_tld.txt >> combined_temp.txt
             local_tld_count=$(wc -l < custom_block_tld.txt | xargs)
             echo "Added $local_tld_count entries from custom_block_tld.txt"
@@ -151,60 +125,19 @@ jobs:
             echo "Local custom TLD blocklist (custom_block_tld.txt) not found, skipping."
           fi
           
-          # 合并和去重
           sort -u combined_temp.txt > combined_unsorted.txt
-          
-          # ===========================================
-          # NEW STEP: 智能合并 Natsuki-List 独家规则
-          # ===========================================
-          echo "Fetching and merging unique rules from Natsuki-List..."
-          
-          # 1. 下载 Natsuki-List (AdGuardHome格式)
-          curl -s "https://github.com/Natsuki-Kaede/Natsuki-List/raw/refs/heads/main/adguardhome.txt" -o natsuki_raw.txt
-          
-          # 2. 清洗Natsuki规则：移除注释、空行，提取核心域名
-          grep -v -e '^!' -e '^#' natsuki_raw.txt | \
-            sed -E 's#^\|\|([a-zA-Z0-9.*_-]+)\^.*#\1#; s#\^$##; s#\^.*##' | \
-            sed 's#^\.##' | \
-            sort -u > natsuki_domains.txt
-          
-          # 3. 清洗现有主规则（combined_unsorted.txt），提取核心域名
-          # 注意：combined_unsorted.txt 包含来自sources.txt和custom_block_tld.txt的原始规则
-          sed -E 's#^\|\|([a-zA-Z0-9.*_-]+)\^.*#\1#; s#\^$##; s#\^.*##' combined_unsorted.txt | \
-            sed 's#^\.##' | \
-            sort -u > existing_domains.txt
-          
-          # 4. 精准比对：找出 Natsuki 中有而现有列表中没有的域名
-          comm -13 existing_domains.txt natsuki_domains.txt > unique_domains.txt
-          
-          # 5. 将独家域名转换回高效的 Adblock 语法，并追加到主列表中
-          if [ -s unique_domains.txt ]; then
-            sed 's/^/||&^/' unique_domains.txt >> combined_unsorted.txt
-            unique_count=$(wc -l < unique_domains.txt | xargs)
-            echo "Successfully merged $unique_count unique rules from Natsuki-List."
-          else
-            echo "No new unique rules found from Natsuki-List."
-          fi
-          
-          # 6. 清理本步骤的临时文件
-          rm -f natsuki_raw.txt natsuki_domains.txt existing_domains.txt unique_domains.txt
-          
-          # ===========================================
-          # STEP 4: 应用白名单
-          # ===========================================
+
           removed_count=0
           if [ -s "total_whitelist_clean.txt" ]; then
             echo "Applying whitelist to blocklist..."
             initial_count=$(wc -l < combined_unsorted.txt | xargs)
             
-            # 应用白名单过滤
             grep -vFx -f total_whitelist_clean.txt combined_unsorted.txt > combined_cleaned.txt
             
             final_count=$(wc -l < combined_cleaned.txt | xargs)
             removed_count=$((initial_count - final_count))
             echo "Removed $removed_count entries via whitelist"
             
-            # 输出被移除的域名（前10个作为示例）
             if [ $removed_count -gt 0 ]; then
               echo "Sample of removed domains:"
               grep -Fx -f total_whitelist_clean.txt combined_unsorted.txt | head -10
@@ -214,35 +147,24 @@ jobs:
             mv combined_unsorted.txt combined_cleaned.txt
           fi
 
-          # ===========================================
-          # STEP 5: 生成最终列表（简化标题头）
-          # ===========================================
-          # 创建简洁的标题头（模仿AdRules格式）
           echo "[Adblock Plus 2.0]" > header.txt
           echo "! Title: NetBlocker" >> header.txt
           echo "! Homepage: https://github.com/${{ github.repository }}" >> header.txt
           echo "! Version: $new_version" >> header.txt
           
-          # 修复这里：避免括号语法错误
           last_modified=$(date -u +"%Y-%m-%d %H:%M:%S")
           echo "! Last modified: ${last_modified}(GMT+0)" >> header.txt
           
           echo "! Description: Aggregated from multiple high-quality blocklist sources." >> header.txt
           
-          # 添加统计信息
           line_count=$(wc -l < combined_cleaned.txt | xargs)
           echo "! Total count: $line_count" >> header.txt
           echo "! Whitelist entries applied: $removed_count" >> header.txt
           
-          # 空行分隔标题头和规则
           echo "" >> header.txt
           
-          # 最终输出
           cat header.txt combined_cleaned.txt > list/NetBlocker.txt
           
-          # ===========================================
-          # STEP 6: 清理临时文件
-          # ===========================================
           rm -f combined_temp.txt combined_unsorted.txt combined_cleaned.txt header.txt
           rm -f adguard_exclusions.txt adguard_exceptions.txt adguard_base_allowlist.txt
           rm -f adguard_exclusions_clean.txt adguard_exceptions_clean.txt adguard_base_allowlist_clean.txt
