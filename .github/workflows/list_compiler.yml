@@ -35,13 +35,13 @@ jobs:
           new_version=$(awk "BEGIN {printf \"%.2f\", $current_version + 0.01}")
           echo $new_version > version.txt
 
-          # Create Header (不显示具体的源URL)
+          # Create Header
           echo "! Title: NetBlocker" > header.txt
           echo "! Version: $new_version" >> header.txt
           echo "! Last modified: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> header.txt
           echo "! License: https://github.com/${{ github.repository }}/blob/main/LICENSE" >> header.txt
-          # 不再循环读取sources.txt并显示源URL
           echo "! Aggregated from multiple high-quality blocklist sources" >> header.txt
+          echo "! Whitelist applied from: allowlist.txt" >> header.txt
           echo "!" >> header.txt
 
           # Download and Clean
@@ -58,14 +58,33 @@ jobs:
           # Combine
           sort -u combined_temp.txt > combined_unsorted.txt
           
-          # Apply Allowlist
-          if [ -f "do_not_block_temporary" ]; then
-            # Clean allowlist (remove whitespace, empty lines, and dates)
-            # Remove comments (dates) starting with #
-            sed 's/ *#.*//' do_not_block_temporary | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed '/^$/d' > do_not_block_clean
-            grep -vFx -f do_not_block_clean combined_unsorted.txt > combined_cleaned.txt
-            rm do_not_block_clean
+          # Apply Allowlist (白名单)
+          if [ -f "allowlist.txt" ]; then
+            echo "Applying allowlist..."
+            # Clean allowlist (remove comments, whitespace, empty lines)
+            # 移除行内和行首的注释（以#开头的内容）
+            # 支持两种格式的注释：
+            # 1. 整行注释: # comment
+            # 2. 行内注释: domain.com # comment
+            sed 's/#.*//' allowlist.txt | \
+                sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | \
+                sed '/^$/d' > allowlist_clean.txt
+            
+            # 统计白名单条目数
+            allowlist_count=$(wc -l < allowlist_clean.txt | xargs)
+            echo "Allowlist entries: $allowlist_count"
+            
+            # 应用白名单：从blocklist中排除白名单中的域名
+            if [ -s "allowlist_clean.txt" ]; then
+              grep -vFx -f allowlist_clean.txt combined_unsorted.txt > combined_cleaned.txt
+              echo "Removed $(( $(wc -l < combined_unsorted.txt) - $(wc -l < combined_cleaned.txt) )) entries via allowlist"
+            else
+              mv combined_unsorted.txt combined_cleaned.txt
+              echo "Allowlist is empty or contains only comments"
+            fi
+            rm allowlist_clean.txt
           else
+            echo "No allowlist.txt found, skipping allowlist filter"
             mv combined_unsorted.txt combined_cleaned.txt
           fi
 
@@ -77,7 +96,7 @@ jobs:
           cat header.txt combined_cleaned.txt > list/NetBlocker.txt
           
           # Cleanup
-          rm combined_temp.txt combined_unsorted.txt combined_cleaned.txt header.txt
+          rm -f combined_temp.txt combined_unsorted.txt combined_cleaned.txt header.txt
 
       # Commit and push changes (ensuring a commit always happens)
       - name: Commit and Push
