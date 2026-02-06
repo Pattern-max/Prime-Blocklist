@@ -1,0 +1,2 @@
+! 放行AdGuard
+@@||adguard.com^
