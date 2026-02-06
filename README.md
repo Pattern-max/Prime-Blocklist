@@ -19,7 +19,6 @@ This list combines the following sources:
 
 - **[HaGeZi's Pro mini DNS/Browser Blocklist](https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.mini.txt)**: The recommended core list for balanced ad and tracker blocking with minimal false positives. It intelligently integrates filtering from multiple reputable sources. [Report false positive](https://github.com/hagezi/dns-blocklists/issues)
 - **[HaGeZi's Threat Intelligence Feeds DNS Blocklist - medium version](https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/tif.medium.txt)**: Specialized security reinforcement focusing on blocking emerging threats such as phishing, malware, cryptojacking, and scam domains. [Report false positive](https://github.com/hagezi/dns-blocklists/issues)
-- **[HaGeZi's The World's Most Abused TLDs](https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/spam-tlds.txt)**: Specialized security reinforcement focusing on blocking emerging threats such as phishing, malware, cryptojacking, and scam domains. [Report false positive](https://github.com/hagezi/dns-blocklists/issues)
 
 ## 🔄 Updates
 
