@@ -35,6 +35,7 @@ jobs:
           echo "! - AdGuard DNS Exceptions" >> header.txt
           echo "! - AdGuard BaseFilter Allowlist" >> header.txt
           echo "! - Local allowlist.txt (if present)" >> header.txt
+          echo "! - Local custom TLD blocklist (if present)" >> header.txt
           echo "!" >> header.txt
 
           # ===========================================
@@ -152,6 +153,17 @@ jobs:
               curl -s "$url" | grep -v -e "^!" -e "^#" -e "^\[" >> combined_temp.txt
             fi
           done < sources.txt
+          
+          # 添加本地自定义TLD拦截规则
+          if [ -f "custom_block_tld.txt" ]; then
+            echo "Adding local custom TLD blocklist..."
+            # 直接将该文件内容追加到临时合并文件中
+            cat custom_block_tld.txt >> combined_temp.txt
+            local_tld_count=$(wc -l < custom_block_tld.txt | xargs)
+            echo "Added $local_tld_count entries from custom_block_tld.txt"
+          else
+            echo "Local custom TLD blocklist (custom_block_tld.txt) not found, skipping."
+          fi
           
           # 合并和去重
           sort -u combined_temp.txt > combined_unsorted.txt
