@@ -15,4 +15,3 @@ https://hblock.molinero.dev/hosts_adblock.txt
 https://small.oisd.nl
 https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
 https://someonewhocares.org/hosts/
-https://github.com/217heidai/adblockfilters/raw/refs/heads/main/rules/white.txt
