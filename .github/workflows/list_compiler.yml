@@ -176,8 +176,8 @@ jobs:
             echo "Applying whitelist to blocklist..."
             initial_count=$(wc -l < combined_unsorted.txt | xargs)
             
-            # 应用白名单过滤
-            grep -vFx -f total_whitelist_clean.txt combined_unsorted.txt > combined_cleaned.txt
+            # 【关键修改】应用白名单过滤：将 -vFx 改为 -v，允许部分匹配
+            grep -v -f total_whitelist_clean.txt combined_unsorted.txt > combined_cleaned.txt
             
             final_count=$(wc -l < combined_cleaned.txt | xargs)
             removed_count=$((initial_count - final_count))
