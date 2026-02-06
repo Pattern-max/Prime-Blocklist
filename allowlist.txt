@@ -1,333 +1,165 @@
-#!-白名单-!#
+# ============================================
+# NetBlocker 基础稳定白名单
+# 这些域名通常是网站正常运行所必需的
+# ============================================
 
-#! Apple 白名单 Start !#
-#苹果商店
-xp.apple.com
-#苹果音乐
-securemetrics.apple.com
-#苹果小游戏
-stats.gc.apple.com
-#苹果图标
-is[0-9]\-ssl.mzstatic.com
-#! Apple 白名单 End !#
+# ========== 操作系统和服务 ==========
+# Windows 更新和激活
+*.windowsupdate.com
+*.update.microsoft.com
+*.microsoft.com
+*.msftncsi.com
+*.msecnd.net
 
-#! 网易 白名单 Start !#
-#光遇
-fp-upload.dun.163.com
-#网易严选商家后台 #140
-dl.reg.163.com
-#网易云音乐-直播
-api.iplay.163.com
-#! 网易 白名单 End !#
+# Apple 服务
+*.apple.com
+*.icloud.com
+*.itunes.apple.com
+*.mzstatic.com
 
-#! 百度 白名单 Start !#
-#手机web百度跳转
-boxer.baidu.com
-#百度盘p2p
-bcsp2p.baidu.com
-#百度地图 #201
-newvector.map.baidu.com
-#额外
-sv.map.baidu.com
-#百度贴吧签到
-als.baidu.com
-#贴吧网页版表情 #146
-gsp0.baidu.com
-#成都 地震预警
-newloc.map.n.shifen.com
-#爱奇艺VIP活动
-act.vip.iqiyi.com
-#投屏
-cupid.iqiyi.com
-#! 百度 白名单 End !#
+# Linux 软件源
+*.debian.org
+*.ubuntu.com
+*.archlinux.org
+*.centos.org
 
-#! Microsoft 白名单 Start !#
-#Team #242
-presence.teams.live.com
-#win天气 #202
-api.msn.com
-#skype #199 #188
-events.data.microsoft.com
-mobile.pipe.aria.microsoft.com
-browser.pipe.aria.microsoft.com
-c1.skype.com
-c.bing.com
-#edge and windows
-ntp.msn.cn
-ntp.msn.com
-assets.msn.cn
-#Microsoft游戏纸牌
-solitaireevents.microsoftcasualgames.com
-#Azure页面 #234
-msedge.net
-#azure控制台 #236
-monitor.azure.com
-#! Microsoft 白名单 End !#
+# ========== 云服务和CDN ==========
+# Amazon AWS (非常重要，很多网站使用)
+*.amazonaws.com
+*.cloudfront.net
 
-#! 小米 白名单 Start !#
-# 小米 隐私条款撤回 #195
-data.sec.miui.com
-#MIUI校正流量
-api.sec.miui.com
-# 小米社区
-api.vip.miui.com
-#mipush
-chat.xiaomi.net
-register.xmpush.xiaomi.com
-cn.app.chat.xiaomi.net
-resolver.msg.xiaomi.net
-#小米天气
-wtradv.market.xiaomi.com
-#应用商店
-f8.market.xiaomi.com
-#! 小米 白名单 End !#
+# Google Cloud
+*.googleapis.com
+*.googleusercontent.com
+*.gstatic.com
 
-#! Google 白名单 Start !#
-# 186 麦当劳
-firebaseremoteconfig.googleapis.com
-#google
-safebrowsing.googleapis.com
-#mytvsuper
-imasdk.googleapis.com
-#fcm push
-firebaseinstallations.googleapis.com
-#! Google 白名单 End !#
+# Microsoft Azure
+*.azure.com
+*.azureedge.net
+*.azurewebsites.net
 
-#! 三大运营商 白名单 Start !#
-#电信一键登录
-id6.me
-#移动一键登录
-da.mmarket.com
-#免流
-cmpassport.com
-#中国联通app充值以及相关页面误杀 #153
-fraudmetrix.cn
-#移动云盘AI
-ad.mcloud.139.com
-#! 三大运营商 白名单 End !#
+# Cloudflare (CDN和防护服务)
+*.cloudflare.com
+*.cloudflare-dns.com
 
-#! 阿里 白名单 Start !#
-#阿里
-amdc.m.taobao.com
-#淘宝千牛商家 #151
-acs.m.taobao.com
-#淘宝
-click.mz.simba.taobao.com
-#淘宝阿里旺旺买家版聊天对话窗
-amos.alicdn.com
-#UC浏览器
-wgo.mmstat.com
-gm.mmstat.com
-#优酷
-mmstat.com
-#饿了么会员开通
-cashier.ele.me
-#饿了么再来一单
-buy.ele.me
-#饿了么搜索
-h-adashx.ut.ele.me
-# 夸克登录
-api.open.uc.cn
-# uc
-p.bokecc.com
-#! 阿里 白名单 End !#
+# Fastly (CDN)
+*.fastly.net
 
-#! 直播与短视频平台 白名单 Start !#
-#斗鱼礼物
-gift.douyucdn.cn
-#抖音图片
-p3-ad-sign.byteimg.com
-#虎牙直播 #177
-va.huya.com
-#火山视频图片
-img2.autoimg.cn
-#今日头条
-ib.snssdk.com
-ic.snssdk.com
-is.snssdk.com
-#抖音验证码
-mcs.snssdk.com
-vcs.snssdk.com
-verify.snssdk.com
-log.snssdk.com
-#虎牙
-livewebbs2.msstatic.com
-liveweb\*\.msstatic\.com
-#哔哩哔哩橱窗功能 #122
-miniapp.bilibili.com
-#bili评论
-grpc.biliapi.net
-#bili直播
-live-trace.bilibili.com
-#! 直播与短视频平台 白名单 End !#
+# Akamai (CDN)
+*.akamaihd.net
+*.akamaiedge.net
+*.akamaitechnologies.com
 
-#! 未分类大厂 白名单 Start !#
-#华为健康 #239
-terms-drcn.platform.dbankcloud.cn
+# ========== 开发者和技术平台 ==========
+# GitHub (代码托管)
+*.github.com
+*.github.io
+*.githubusercontent.com
+*.githubassets.com
 
-#字节 #238
-tnc-boot.capcutapi.com
-tnc-sg.capcutapi.com
-tnc0-aliec2.zijieapi.com
-tnc0-alisc1.zijieapi.com
-tnc0-bjlgy.zijieapi.com
-tnc16-alisg.isnssdk.com
-tnc16-useast1a.isnssdk.com
-tnc3-aliec1.toutiaoapi.com
-tnc3-aliec2.bytedance.com
-tnc3-aliec2.snssdk.com
-tnc3-aliec2.toutiaoapi.com
-tnc3-alisc1.bytedance.com
-tnc3-alisc1.snssdk.com
-tnc3-alisc1.toutiaoapi.com
-tnc3-alisc2.zijieapi.com
-tnc3-bjlgy.bytedance.com
-tnc3-bjlgy.snssdk.com
-tnc3-bjlgy.toutiaoapi.com
+# Stack Overflow (开发者社区)
+*.stackoverflow.com
+*.stackexchange.com
+*.sstatic.net
 
-#Cloudflare #237
-cloudflareinsights.com
+# GitLab
+*.gitlab.com
+*.gitlab-static.net
 
-#douban #233
-erebor.douban.com
+# ========== 内容分发 ==========
+# 常用字体和图标
+*.fonts.googleapis.com
+*.fonts.gstatic.com
+*.bootstrapcdn.com
+*.fontawesome.com
 
-#facebook
-graph.facebook.com
+# JavaScript 库
+*.jquery.com
+*.cdnjs.com
+*.jsdelivr.net
+*.unpkg.com
 
-#pdd #224
-th.pinduoduo.com
-ta.pinduoduo.com
-#pronhub cdn
-evtubescms.phncdn.com
-#雅虎 js
-consent.cmp.oath.com
-# 迅雷书签
-api-shoulei-ssl.xunlei.com
-#cdn
-cloudfront.net
-#京东礼品卡
-gia.jd.com
-#微信验证
-szlong.weixin.qq.com
-# 搜狗同步
-get.sogou.com
-input.shouji.sogou.com
-ping.pinyin.sogou.com
-info.pinyin.sogou.com
-#360智慧生活
-sobot.com
-#360DNS
-qhres2.com
-# adtidy
-^[a-zA-Z0-9-]*\.*adtidy\.org$
-adtidy.org
-# 通配误杀脚本之家
-\*\.jbzj\.com
-#adg邮件跳转
-email-link.adtidy.org
-#奇怪的cname误杀
-tanx.com
-#招商银行掌上生活
-metric.ccc.cmbchina.com
-#OPPO
-client-uc.heytapmobi.com
-#OPPO应用配置
-appconf.heytapdownload.com
-#QQ打卡
-tianshu.gtimg.cn
-#Intel驱动
-static.cloud.coveo.com
-#企业微信 #208
-tdid.m.qq.com
-#! 未分类大厂 白名单 End !#
+# ========== 分析和监控 (可选) ==========
+# 以下分析服务可以放行，但它们可能涉及隐私
+# 如果您注重隐私，可以删除这些
+*.google-analytics.com
+*.googletagmanager.com
+*.doubleclick.net  # 谨慎：这是广告服务
+*.amazon-adsystem.com  # 谨慎
 
-#! 乱七八糟的域名 白名单 Start !#
-#Volkswagen #246
-d2cmedia.ca
+# ========== 社交登录 (可选) ==========
+# 如果您使用社交登录功能
+*.facebook.com
+*.fbcdn.net
+*.twitter.com
+*.twimg.com
 
-#天气 245
-dl.zuimeitianqi.com
+# ========== 安全证书验证 ==========
+# SSL/TLS 证书验证
+*.ocsp.apple.com
+*.ocsp.digicert.com
+*.ocsp.godaddy.com
+*.crl.globalsign.com
 
-#jameswoof 游戏
-app.jameswoof.com
+# ========== 网络基础服务 ==========
+# DNS 和网络检测
+*.dns.google
+*.1.1.1.1
+*.captive.apple.com
+*.networkadvertising.org
 
-#OpenCat
-lc-cn-n1-shared.com
+# ========== 本地网络 ==========
+# 内网地址和本地服务
+localhost
+*.local
+*.localhost
+*.home
+*.lan
 
-#bmcx.com cname
-7x24s.com
+# 私有IP地址段
+10.*
+192.168.*
+172.16.*
+172.17.*
+172.18.*
+172.19.*
+172.20.*
+172.21.*
+172.22.*
+172.23.*
+172.24.*
+172.25.*
+172.26.*
+172.27.*
+172.28.*
+172.29.*
+172.30.*
+172.31.*
 
-# 待补充
-similarweb.com
+# ========== 邮件服务 ==========
+# 常用邮件服务
+*.mail.google.com
+*.outlook.com
+*.office365.com
+*.imap.gmail.com
+*.pop.gmail.com
+*.smtp.gmail.com
 
-#纵横小说
-static.zongheng.com
+# ========== 付款和金融服务 (谨慎) ==========
+# 这些需要谨慎，有些可能是跟踪器
+*.paypal.com
+*.stripe.com
+*.braintreegateway.com
 
-#乘车码 #178
-ecard.shenzhentong.com
+# ========== 教育和技术资源 ==========
+# 技术文档和学习资源
+*.wikipedia.org
+*.wikimedia.org
+*.mozilla.org
+*.w3.org
+*.ietf.org
 
-#东方财富 图片
-dfcfw.com
-
-#umiwi.com
-imgcdn.umiwi.com
-
-#误杀CNAME angtv.cc
-gotoip55.com
-
-# 网盘 #168
-pan.tenire.com
-
-#今日基督教 #167
-christianitytoday.activehosted.com
-
-#sm图床
-loli.net
-
-#电影
-free-adsmind.ugdtimg.com
-
-#mytvsuper #144
-jwpcdn.com
-
-#游戏换购码
-statistics.pandadastudio.com
-
-#云课堂
-www.mosoteach.cn
-api.mosoteach.cn
-
-# 图床
-z4a.net
-
-# 开心消消乐
-animalmobile.happyelements.cn
-
-# 汽车之家加载页
-activity.app.autohome.com.cn
-
-#不知道的域名 #49
-epochtimes.com
-epochtimes.org
-
-# 购物党
-browser.gwdang.com
-
-#206
-logrocket.com
-
-#app mirror #209
-html-load.com
-content-loader.com
-
-#215
-instant.page
-
-#game randomly stutters or freezes. #219
-vs-api.voodoo-tech.io
-
-#! 乱七八糟的域名 白名单 End !#
-
-
-#---END---#
-
+# ========== 特殊规则 ==========
+# 以下是一些特殊情况
+||example.org^  # 示例规则，用于测试
+@@||example.com^$document  # AdGuard格式的例外规则
