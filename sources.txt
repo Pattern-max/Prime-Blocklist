@@ -1,4 +1,15 @@
-https://raw.githubusercontent.com/cjx82630/cjxlist/master/cjx-annoyance.txt
-https://cdn.jsdelivr.net/gh/sbwml/halflife-list@master/ad.txt
+https://filters.adtidy.org/android/filters/2_optimized.txt
+https://filters.adtidy.org/android/filters/11_optimized.txt
+https://filters.adtidy.org/android/filters/3_optimized.txt
+https://filters.adtidy.org/android/filters/17_optimized.txt
+https://filters.adtidy.org/android/filters/4_optimized.txt
+https://filters.adtidy.org/android/filters/18_optimized.txt
+https://filters.adtidy.org/android/filters/19_optimized.txt
+https://filters.adtidy.org/android/filters/20_optimized.txt
+https://filters.adtidy.org/android/filters/21_optimized.txt
+https://filters.adtidy.org/android/filters/22_optimized.txt
+https://urlhaus-filter.pages.dev/urlhaus-filter-ag-online.txt
+https://filters.adtidy.org/android/filters/224_optimized.txt
+https://easylist-downloads.adblockplus.org/antiadblockfilters.txt
 https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/multi.txt
 https://big.oisd.nl
