@@ -155,6 +155,41 @@ jobs:
           sort -u combined_temp.txt > combined_unsorted.txt
           
           # ===========================================
+          # NEW STEP: 智能合并 Natsuki-List 独家规则
+          # ===========================================
+          echo "Fetching and merging unique rules from Natsuki-List..."
+          
+          # 1. 下载 Natsuki-List (AdGuardHome格式)
+          curl -s "https://github.com/Natsuki-Kaede/Natsuki-List/raw/refs/heads/main/adguardhome.txt" -o natsuki_raw.txt
+          
+          # 2. 清洗Natsuki规则：移除注释、空行，提取核心域名
+          grep -v -e '^!' -e '^#' natsuki_raw.txt | \
+            sed -E 's#^\|\|([a-zA-Z0-9.*_-]+)\^.*#\1#; s#\^$##; s#\^.*##' | \
+            sed 's#^\.##' | \
+            sort -u > natsuki_domains.txt
+          
+          # 3. 清洗现有主规则（combined_unsorted.txt），提取核心域名
+          # 注意：combined_unsorted.txt 包含来自sources.txt和custom_block_tld.txt的原始规则
+          sed -E 's#^\|\|([a-zA-Z0-9.*_-]+)\^.*#\1#; s#\^$##; s#\^.*##' combined_unsorted.txt | \
+            sed 's#^\.##' | \
+            sort -u > existing_domains.txt
+          
+          # 4. 精准比对：找出 Natsuki 中有而现有列表中没有的域名
+          comm -13 existing_domains.txt natsuki_domains.txt > unique_domains.txt
+          
+          # 5. 将独家域名转换回高效的 Adblock 语法，并追加到主列表中
+          if [ -s unique_domains.txt ]; then
+            sed 's/^/||&^/' unique_domains.txt >> combined_unsorted.txt
+            unique_count=$(wc -l < unique_domains.txt | xargs)
+            echo "Successfully merged $unique_count unique rules from Natsuki-List."
+          else
+            echo "No new unique rules found from Natsuki-List."
+          fi
+          
+          # 6. 清理本步骤的临时文件
+          rm -f natsuki_raw.txt natsuki_domains.txt existing_domains.txt unique_domains.txt
+          
+          # ===========================================
           # STEP 4: 应用白名单
           # ===========================================
           removed_count=0
