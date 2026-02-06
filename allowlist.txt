@@ -1,163 +1,358 @@
 # ===========================================
-# NetBlocker 本地白名单文件
-# 此文件中的规则将优先于任何黑名单规则
-# 格式：纯域名或正则表达式（一行一个）
-# 注释以#开头
-# ===========================================
-
-# ============ 核心服务 ============
-# 操作系统和云服务
-microsoft.com
-apple.com
-google.com
-mozilla.org
-ubuntu.com
-debian.org
-cloudflare.com
-amazonaws.com
-azure.com
-gstatic.com
-
-# ============ CDN和静态资源 ============
-# 确保网站正常加载
-cdn.jsdelivr.net
-unpkg.com
-bootstrapcdn.com
-cloudfront.net
-fastly.net
-akamaihd.net
-
-# ============ 开发工具和API ============
-# 开发者和服务集成
-github.com
-gitlab.com
-bitbucket.org
-docker.com
-npmjs.com
-pypi.org
-stackoverflow.com
-
-# ============ 安全证书 ============
-# SSL/TLS证书相关
-letsencrypt.org
-digicert.com
-ssl.com
-sectigo.com
-comodoca.com
-
-# ============ 分析和监控 ============
-# 必要的分析服务（仅限基础）
-matomo.org
-plausible.io
-umami.is
-goatcounter.com
-
-# ============ 支付网关 ============
-# 确保在线支付正常
-stripe.com
-paypal.com
-braintreegateway.com
-squareup.com
-
-# ============ 邮件服务 ============
-# 邮件发送和接收
-sendgrid.net
-mailgun.org
-postmarkapp.com
-sparkpostmail.com
-amazonses.com
-
-# ============ 地图和定位 ============
-# 地图API服务
-openstreetmap.org
-mapbox.com
-maps.google.com
-nominatim.openstreetmap.org
-
-# ============ 字体和图标 ============
-# 常用字体库
-fonts.googleapis.com
-fonts.gstatic.com
-fontawesome.com
-use.fontawesome.com
-kit.fontawesome.com
-
-# ============ 中国常用服务 ============
-# 国内常用且安全的服务
-weixin.qq.com
-qq.com
-baidu.com
-alipay.com
-taobao.com
-jd.com
-bilibili.com
-zhihu.com
-douban.com
-
-# ============ 办公和协作 ============
-# 办公软件服务
-office.com
-office365.com
-zoom.us
-teams.microsoft.com
-slack.com
-discord.com
-
-# ============ 版本更新 ============
-# 软件更新和补丁
-windowsupdate.com
-update.microsoft.com
-swscan.apple.com
-aus2.mozilla.org
-download.mozilla.org
-
-# ============ DNS和网络基础设施 ============
-# 网络核心服务
-1.1.1.1
-8.8.8.8
-9.9.9.9
-opendns.com
-dns.google
-
-# ============ 时间和日期服务 ============
-# 时间同步
-time.windows.com
-time.apple.com
-pool.ntp.org
-ntp.org
-
-# ============ 重要开源项目 ============
-# 开源基础设施
-python.org
-nodejs.org
-rubygems.org
-cran.r-project.org
-maven.apache.org
-
-# ============ 企业VPN和远程访问 ============
-# 企业级服务（选择性添加）
-*.vpn.example.com  # 替换为您的企业VPN域名
-*.remote.example.com
-
-# ============ 自定义例外规则 ============
-# 在此处添加您的个人例外
-# 格式示例：
-# *.mycompany.com  # 公司内部域名
-# *.homelab.local  # 家庭实验室域名
-# internal-server.local
-
-# ===========================================
-# 注意：
-# 1. 此白名单不会影响custom_block_tld.txt中的TLD拦截
-# 2. 所有规则会被转换为纯域名格式进行处理
-# 3. 每行一个规则，支持通配符(*)
-# 4. 定期审查此列表，移除不再需要的规则
-# ===========================================
-
-# ===========================================
 # 放行AdGuard
 @@||adguard.com^
 
 # ===========================================
 
+# ===========================================
+# NetBlocker 中国用户专用白名单
+# 确保中国用户的手机、电脑及常用软件正常使用
+# ===========================================
 
+# ============ 系统与云服务 ============
+# 操作系统更新和激活
+apple.com  # iOS/macOS激活和更新
+microsoft.com  # Windows激活和更新
+windowsupdate.com
+update.microsoft.com
+swscan.apple.com
+mesu.apple.com
+gdmf.apple.com
+
+# 云服务
+cloud.tencent.com
+aliyun.com
+baidubce.com
+huaweicloud.com
+
+# ============ 手机厂商服务 ============
+# 华为
+huawei.com
+vmall.com
+hicloud.com
+hwccpc.com
+
+# 小米
+mi.com
+xiaomi.com
+xiaomiyoupin.com
+mifile.cn
+
+# OPPO/vivo/一加
+oppo.com
+vivo.com
+oneplus.com
+realme.com
+
+# 荣耀
+hihonor.com
+honor.com
+
+# 魅族
+meizu.com
+flyme.cn
+
+# ============ 即时通讯 ============
+# 微信
+weixin.qq.com
+wx.qq.com
+qpic.cn
+wechat.com
+tencent.com
+
+# QQ
+qq.com
+qzone.com
+qlogo.cn
+gtimg.cn
+
+# 钉钉
+dingtalk.com
+dingtalkapps.com
+alibaba.com
+
+# 飞书
+feishu.cn
+larksuite.com
+byteoversea.com
+
+# 企业微信
+work.weixin.qq.com
+qiyeweixin.com
+
+# ============ 支付与金融 ============
+# 支付宝
+alipay.com
+alipayobjects.com
+alibaba-inc.com
+
+# 微信支付
+pay.weixin.qq.com
+tenpay.com
+
+# 银联
+unionpay.com
+95516.com
+
+# 银行（主要）
+icbc.com.cn
+ccb.com
+abchina.com
+bankcomm.com
+cmbchina.com
+
+# ============ 电商与生活 ============
+# 淘宝/天猫
+taobao.com
+tmall.com
+taobao.net
+alibaba-inc.com
+
+# 京东
+jd.com
+jd.hk
+360buy.com
+
+# 拼多多
+pinduoduo.com
+yangkeduo.com
+
+# 美团
+meituan.com
+dianping.com
+
+# 饿了么
+ele.me
+alibaba.com
+
+# 抖音/抖音电商
+douyin.com
+bytedance.com
+toutiao.com
+
+# ============ 社交与内容 ============
+# 微博
+weibo.com
+sina.com.cn
+sinaimg.cn
+
+# 知乎
+zhihu.com
+zhihuishu.com
+
+# B站
+bilibili.com
+bilivideo.com
+hdslb.com
+
+# 小红书
+xiaohongshu.com
+
+# 豆瓣
+douban.com
+
+# ============ 地图与出行 ============
+# 百度地图
+baidu.com
+map.baidu.com
+
+# 高德地图
+amap.com
+autonavi.com
+
+# 腾讯地图
+map.qq.com
+
+# 滴滴出行
+didiglobal.com
+xiaojukeji.com
+
+# 出行12306
+12306.cn
+kyfw.12306.cn
+
+# ============ 邮件与办公 ============
+# 网易邮箱
+163.com
+126.com
+yeah.net
+netease.com
+
+# QQ邮箱
+qq.com
+foxmail.com
+
+# 企业邮箱
+qiye.163.com
+exmail.qq.com
+
+# WPS办公
+wps.cn
+kingsoft.com
+
+# 腾讯文档
+docs.qq.com
+office.qq.com
+
+# ============ 云盘与存储 ============
+# 百度网盘
+pan.baidu.com
+baidupcs.com
+
+# 腾讯微云
+weiyun.com
+
+# 阿里云盘
+aliyundrive.com
+
+# 坚果云
+jianguoyun.com
+
+# ============ 视频与音乐 ============
+# 爱奇艺
+iqiyi.com
+qiyi.com
+
+# 腾讯视频
+v.qq.com
+video.qq.com
+
+# 优酷
+youku.com
+ykimg.com
+
+# 芒果TV
+mgtv.com
+hunantv.com
+
+# 网易云音乐
+music.163.com
+netease.com
+
+# QQ音乐
+y.qq.com
+qqmusic.com
+
+# 酷狗/酷我
+kugou.com
+kuwo.cn
+
+# ============ 安全软件 ============
+# 360安全
+360.cn
+360safe.com
+
+# 腾讯电脑管家
+guanjia.qq.com
+
+# 金山毒霸
+duba.net
+ijinshan.com
+
+# 火绒安全
+huorong.cn
+
+# ============ 游戏平台 ============
+# Steam中国
+steamchina.com
+steampowered.com
+
+# 腾讯游戏
+wegame.com
+tencentgames.com
+
+# 网易游戏
+netease.com
+163.com
+
+# 米哈游
+mihoyo.com
+hoyoverse.com
+
+# ============ 软件商店 ============
+# 应用宝
+myapp.com
+
+# 小米应用商店
+xiaomi.com
+
+# 华为应用市场
+appgallery.huawei.com
+
+# vivo应用商店
+vivo.com
+
+# OPPO软件商店
+oppo.com
+
+# ============ 政府与公共服务 ============
+# 政府网站
+gov.cn
+12345.cn
+
+# 健康码/行程码（各省市）
+healthcode.cn
+行程码.cn
+
+# 税务
+chinatax.gov.cn
+
+# 社保
+12333.gov.cn
+
+# ============ 教育 ============
+# 学信网
+chsi.com.cn
+
+# 中国大学MOOC
+icourse163.org
+
+# 腾讯课堂
+ke.qq.com
+
+# 网易云课堂
+study.163.com
+
+# ============ 开发者服务 ============
+# 国内镜像源
+npm.taobao.org
+pypi.tuna.tsinghua.edu.cn
+maven.aliyun.com
+
+# 代码托管
+gitee.com
+coding.net
+
+# ============ 重要CDN ============
+# 国内CDN服务
+cdn.bootcss.com
+cdnjs.cloudflare.com
+fonts.googleapis.com  # 部分国内网站仍用
+fonts.gstatic.com
+
+# ============ 网络基础设施 ============
+# DNS服务
+114.114.114.114
+119.29.29.29
+223.5.5.5
+223.6.6.6
+
+# 时间同步
+ntp.aliyun.com
+ntp1.aliyun.com
+time.windows.com
+time.apple.com
+
+# ============ 自定义区域 ============
+# 在此处添加您的个人例外
+# 公司内部域名示例：
+# *.mycompany.cn
+# *.oa.com
+
+# 家庭网络设备：
+# nas.local
+# router.asus.com
+
+# 智能家居：
+# *.mi.com  # 小米智能家居
+# *.homekit.local
