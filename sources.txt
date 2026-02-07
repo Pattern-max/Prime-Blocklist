@@ -1,5 +1,5 @@
 https://easylist-downloads.adblockplus.org/easylistchina.txt
 https://filters.adtidy.org/extension/ublock/filters/220.txt
 https://cdn.jsdelivr.net/gh/sbwml/halflife-list@master/ad.txt
-https://github.com/Magisk-Modules-Alt-Repo/StevenBlock/raw/refs/heads/main/hosts/energized_spark_hosts
+https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
 https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
