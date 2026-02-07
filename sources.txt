@@ -1,4 +1,5 @@
 https://easylist-downloads.adblockplus.org/easylistchina.txt
 https://filters.adtidy.org/extension/ublock/filters/220.txt
 https://cdn.jsdelivr.net/gh/sbwml/halflife-list@master/ad.txt
-https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
+https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/multi.txt
+https://big.oisd.nl
