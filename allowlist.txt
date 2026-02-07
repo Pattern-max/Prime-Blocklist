@@ -1,358 +1,332 @@
-# ===========================================
-# 放行AdGuard
-@@||adguard.com^
-
-# ===========================================
-
-# ===========================================
-# NetBlocker 中国用户专用白名单
-# 确保中国用户的手机、电脑及常用软件正常使用
-# ===========================================
-
-# ============ 系统与云服务 ============
-# 操作系统更新和激活
-apple.com  # iOS/macOS激活和更新
-microsoft.com  # Windows激活和更新
-windowsupdate.com
-update.microsoft.com
-swscan.apple.com
-mesu.apple.com
-gdmf.apple.com
-
-# 云服务
-cloud.tencent.com
-aliyun.com
-baidubce.com
-huaweicloud.com
-
-# ============ 手机厂商服务 ============
-# 华为
-huawei.com
-vmall.com
-hicloud.com
-hwccpc.com
-
-# 小米
-mi.com
-xiaomi.com
-xiaomiyoupin.com
-mifile.cn
-
-# OPPO/vivo/一加
-oppo.com
-vivo.com
-oneplus.com
-realme.com
-
-# 荣耀
-hihonor.com
-honor.com
-
-# 魅族
-meizu.com
-flyme.cn
-
-# ============ 即时通讯 ============
-# 微信
-weixin.qq.com
-wx.qq.com
-qpic.cn
-wechat.com
-tencent.com
-
-# QQ
-qq.com
-qzone.com
-qlogo.cn
-gtimg.cn
-
-# 钉钉
-dingtalk.com
-dingtalkapps.com
-alibaba.com
-
-# 飞书
-feishu.cn
-larksuite.com
-byteoversea.com
-
-# 企业微信
-work.weixin.qq.com
-qiyeweixin.com
-
-# ============ 支付与金融 ============
-# 支付宝
-alipay.com
-alipayobjects.com
-alibaba-inc.com
-
-# 微信支付
-pay.weixin.qq.com
-tenpay.com
-
-# 银联
-unionpay.com
-95516.com
-
-# 银行（主要）
-icbc.com.cn
-ccb.com
-abchina.com
-bankcomm.com
-cmbchina.com
-
-# ============ 电商与生活 ============
-# 淘宝/天猫
-taobao.com
-tmall.com
-taobao.net
-alibaba-inc.com
-
-# 京东
-jd.com
-jd.hk
-360buy.com
-
-# 拼多多
-pinduoduo.com
-yangkeduo.com
-
-# 美团
-meituan.com
-dianping.com
-
-# 饿了么
-ele.me
-alibaba.com
-
-# 抖音/抖音电商
-douyin.com
-bytedance.com
-toutiao.com
-
-# ============ 社交与内容 ============
-# 微博
-weibo.com
-sina.com.cn
-sinaimg.cn
-
-# 知乎
-zhihu.com
-zhihuishu.com
-
-# B站
-bilibili.com
-bilivideo.com
-hdslb.com
-
-# 小红书
-xiaohongshu.com
-
-# 豆瓣
-douban.com
-
-# ============ 地图与出行 ============
-# 百度地图
-baidu.com
-map.baidu.com
-
-# 高德地图
-amap.com
-autonavi.com
-
-# 腾讯地图
-map.qq.com
-
-# 滴滴出行
-didiglobal.com
-xiaojukeji.com
-
-# 出行12306
-12306.cn
-kyfw.12306.cn
-
-# ============ 邮件与办公 ============
-# 网易邮箱
-163.com
-126.com
-yeah.net
-netease.com
-
-# QQ邮箱
-qq.com
-foxmail.com
-
-# 企业邮箱
-qiye.163.com
-exmail.qq.com
-
-# WPS办公
-wps.cn
-kingsoft.com
-
-# 腾讯文档
-docs.qq.com
-office.qq.com
-
-# ============ 云盘与存储 ============
-# 百度网盘
-pan.baidu.com
-baidupcs.com
-
-# 腾讯微云
-weiyun.com
-
-# 阿里云盘
-aliyundrive.com
-
-# 坚果云
-jianguoyun.com
-
-# ============ 视频与音乐 ============
-# 爱奇艺
-iqiyi.com
-qiyi.com
-
-# 腾讯视频
-v.qq.com
-video.qq.com
-
-# 优酷
-youku.com
-ykimg.com
-
-# 芒果TV
-mgtv.com
-hunantv.com
-
-# 网易云音乐
-music.163.com
-netease.com
-
-# QQ音乐
-y.qq.com
-qqmusic.com
-
-# 酷狗/酷我
-kugou.com
-kuwo.cn
-
-# ============ 安全软件 ============
-# 360安全
-360.cn
-360safe.com
-
-# 腾讯电脑管家
-guanjia.qq.com
-
-# 金山毒霸
-duba.net
-ijinshan.com
-
-# 火绒安全
-huorong.cn
-
-# ============ 游戏平台 ============
-# Steam中国
-steamchina.com
-steampowered.com
-
-# 腾讯游戏
-wegame.com
-tencentgames.com
-
-# 网易游戏
-netease.com
-163.com
-
-# 米哈游
-mihoyo.com
-hoyoverse.com
-
-# ============ 软件商店 ============
-# 应用宝
-myapp.com
-
-# 小米应用商店
-xiaomi.com
-
-# 华为应用市场
-appgallery.huawei.com
-
-# vivo应用商店
-vivo.com
-
-# OPPO软件商店
-oppo.com
-
-# ============ 政府与公共服务 ============
-# 政府网站
-gov.cn
-12345.cn
-
-# 健康码/行程码（各省市）
-healthcode.cn
-行程码.cn
-
-# 税务
-chinatax.gov.cn
-
-# 社保
-12333.gov.cn
-
-# ============ 教育 ============
-# 学信网
-chsi.com.cn
-
-# 中国大学MOOC
-icourse163.org
-
-# 腾讯课堂
-ke.qq.com
-
-# 网易云课堂
-study.163.com
-
-# ============ 开发者服务 ============
-# 国内镜像源
-npm.taobao.org
-pypi.tuna.tsinghua.edu.cn
-maven.aliyun.com
-
-# 代码托管
-gitee.com
-coding.net
-
-# ============ 重要CDN ============
-# 国内CDN服务
-cdn.bootcss.com
-cdnjs.cloudflare.com
-fonts.googleapis.com  # 部分国内网站仍用
-fonts.gstatic.com
-
-# ============ 网络基础设施 ============
-# DNS服务
-114.114.114.114
-119.29.29.29
-223.5.5.5
-223.6.6.6
-
-# 时间同步
-ntp.aliyun.com
-ntp1.aliyun.com
-time.windows.com
-time.apple.com
-
-# ============ 自定义区域 ============
-# 在此处添加您的个人例外
-# 公司内部域名示例：
-# *.mycompany.cn
-# *.oa.com
-
-# 家庭网络设备：
-# nas.local
-# router.asus.com
-
-# 智能家居：
-# *.mi.com  # 小米智能家居
-# *.homekit.local
+#!-白名单-!#
+
+#! Apple 白名单 Start !#
+#苹果商店
+xp.apple.com
+#苹果音乐
+securemetrics.apple.com
+#苹果小游戏
+stats.gc.apple.com
+#苹果图标
+is[0-9]\-ssl.mzstatic.com
+#! Apple 白名单 End !#
+
+#! 网易 白名单 Start !#
+#光遇
+fp-upload.dun.163.com
+#网易严选商家后台 #140
+dl.reg.163.com
+#网易云音乐-直播
+api.iplay.163.com
+#! 网易 白名单 End !#
+
+#! 百度 白名单 Start !#
+#手机web百度跳转
+boxer.baidu.com
+#百度盘p2p
+bcsp2p.baidu.com
+#百度地图 #201
+newvector.map.baidu.com
+#额外
+sv.map.baidu.com
+#百度贴吧签到
+als.baidu.com
+#贴吧网页版表情 #146
+gsp0.baidu.com
+#成都 地震预警
+newloc.map.n.shifen.com
+#爱奇艺VIP活动
+act.vip.iqiyi.com
+#投屏
+cupid.iqiyi.com
+#! 百度 白名单 End !#
+
+#! Microsoft 白名单 Start !#
+#Team #242
+presence.teams.live.com
+#win天气 #202
+api.msn.com
+#skype #199 #188
+events.data.microsoft.com
+mobile.pipe.aria.microsoft.com
+browser.pipe.aria.microsoft.com
+c1.skype.com
+c.bing.com
+#edge and windows
+ntp.msn.cn
+ntp.msn.com
+assets.msn.cn
+#Microsoft游戏纸牌
+solitaireevents.microsoftcasualgames.com
+#Azure页面 #234
+msedge.net
+#azure控制台 #236
+monitor.azure.com
+#! Microsoft 白名单 End !#
+
+#! 小米 白名单 Start !#
+# 小米 隐私条款撤回 #195
+data.sec.miui.com
+#MIUI校正流量
+api.sec.miui.com
+# 小米社区
+api.vip.miui.com
+#mipush
+chat.xiaomi.net
+register.xmpush.xiaomi.com
+cn.app.chat.xiaomi.net
+resolver.msg.xiaomi.net
+#小米天气
+wtradv.market.xiaomi.com
+#应用商店
+f8.market.xiaomi.com
+#! 小米 白名单 End !#
+
+#! Google 白名单 Start !#
+# 186 麦当劳
+firebaseremoteconfig.googleapis.com
+#google
+safebrowsing.googleapis.com
+#mytvsuper
+imasdk.googleapis.com
+#fcm push
+firebaseinstallations.googleapis.com
+#! Google 白名单 End !#
+
+#! 三大运营商 白名单 Start !#
+#电信一键登录
+id6.me
+#移动一键登录
+da.mmarket.com
+#免流
+cmpassport.com
+#中国联通app充值以及相关页面误杀 #153
+fraudmetrix.cn
+#移动云盘AI
+ad.mcloud.139.com
+#! 三大运营商 白名单 End !#
+
+#! 阿里 白名单 Start !#
+#阿里
+amdc.m.taobao.com
+#淘宝千牛商家 #151
+acs.m.taobao.com
+#淘宝
+click.mz.simba.taobao.com
+#淘宝阿里旺旺买家版聊天对话窗
+amos.alicdn.com
+#UC浏览器
+wgo.mmstat.com
+gm.mmstat.com
+#优酷
+mmstat.com
+#饿了么会员开通
+cashier.ele.me
+#饿了么再来一单
+buy.ele.me
+#饿了么搜索
+h-adashx.ut.ele.me
+# 夸克登录
+api.open.uc.cn
+# uc
+p.bokecc.com
+#! 阿里 白名单 End !#
+
+#! 直播与短视频平台 白名单 Start !#
+#斗鱼礼物
+gift.douyucdn.cn
+#抖音图片
+p3-ad-sign.byteimg.com
+#虎牙直播 #177
+va.huya.com
+#火山视频图片
+img2.autoimg.cn
+#今日头条
+ib.snssdk.com
+ic.snssdk.com
+is.snssdk.com
+#抖音验证码
+mcs.snssdk.com
+vcs.snssdk.com
+verify.snssdk.com
+log.snssdk.com
+#虎牙
+livewebbs2.msstatic.com
+liveweb\*\.msstatic\.com
+#哔哩哔哩橱窗功能 #122
+miniapp.bilibili.com
+#bili评论
+grpc.biliapi.net
+#bili直播
+live-trace.bilibili.com
+#! 直播与短视频平台 白名单 End !#
+
+#! 未分类大厂 白名单 Start !#
+#华为健康 #239
+terms-drcn.platform.dbankcloud.cn
+
+#字节 #238
+tnc-boot.capcutapi.com
+tnc-sg.capcutapi.com
+tnc0-aliec2.zijieapi.com
+tnc0-alisc1.zijieapi.com
+tnc0-bjlgy.zijieapi.com
+tnc16-alisg.isnssdk.com
+tnc16-useast1a.isnssdk.com
+tnc3-aliec1.toutiaoapi.com
+tnc3-aliec2.bytedance.com
+tnc3-aliec2.snssdk.com
+tnc3-aliec2.toutiaoapi.com
+tnc3-alisc1.bytedance.com
+tnc3-alisc1.snssdk.com
+tnc3-alisc1.toutiaoapi.com
+tnc3-alisc2.zijieapi.com
+tnc3-bjlgy.bytedance.com
+tnc3-bjlgy.snssdk.com
+tnc3-bjlgy.toutiaoapi.com
+
+#Cloudflare #237
+cloudflareinsights.com
+
+#douban #233
+erebor.douban.com
+
+#facebook
+graph.facebook.com
+
+#pdd #224
+th.pinduoduo.com
+ta.pinduoduo.com
+#pronhub cdn
+evtubescms.phncdn.com
+#雅虎 js
+consent.cmp.oath.com
+# 迅雷书签
+api-shoulei-ssl.xunlei.com
+#cdn
+cloudfront.net
+#京东礼品卡
+gia.jd.com
+#微信验证
+szlong.weixin.qq.com
+# 搜狗同步
+get.sogou.com
+input.shouji.sogou.com
+ping.pinyin.sogou.com
+info.pinyin.sogou.com
+#360智慧生活
+sobot.com
+#360DNS
+qhres2.com
+# adtidy
+^[a-zA-Z0-9-]*\.*adtidy\.org$
+adtidy.org
+# 通配误杀脚本之家
+\*\.jbzj\.com
+#adg邮件跳转
+email-link.adtidy.org
+#奇怪的cname误杀
+tanx.com
+#招商银行掌上生活
+metric.ccc.cmbchina.com
+#OPPO
+client-uc.heytapmobi.com
+#OPPO应用配置
+appconf.heytapdownload.com
+#QQ打卡
+tianshu.gtimg.cn
+#Intel驱动
+static.cloud.coveo.com
+#企业微信 #208
+tdid.m.qq.com
+#! 未分类大厂 白名单 End !#
+
+#! 乱七八糟的域名 白名单 Start !#
+#Volkswagen #246
+d2cmedia.ca
+
+#天气 245
+dl.zuimeitianqi.com
+
+#jameswoof 游戏
+app.jameswoof.com
+
+#OpenCat
+lc-cn-n1-shared.com
+
+#bmcx.com cname
+7x24s.com
+
+# 待补充
+similarweb.com
+
+#纵横小说
+static.zongheng.com
+
+#乘车码 #178
+ecard.shenzhentong.com
+
+#东方财富 图片
+dfcfw.com
+
+#umiwi.com
+imgcdn.umiwi.com
+
+#误杀CNAME angtv.cc
+gotoip55.com
+
+# 网盘 #168
+pan.tenire.com
+
+#今日基督教 #167
+christianitytoday.activehosted.com
+
+#sm图床
+loli.net
+
+#电影
+free-adsmind.ugdtimg.com
+
+#mytvsuper #144
+jwpcdn.com
+
+#游戏换购码
+statistics.pandadastudio.com
+
+#云课堂
+www.mosoteach.cn
+api.mosoteach.cn
+
+# 图床
+z4a.net
+
+# 开心消消乐
+animalmobile.happyelements.cn
+
+# 汽车之家加载页
+activity.app.autohome.com.cn
+
+#不知道的域名 #49
+epochtimes.com
+epochtimes.org
+
+# 购物党
+browser.gwdang.com
+
+#206
+logrocket.com
+
+#app mirror #209
+html-load.com
+content-loader.com
+
+#215
+instant.page
+
+#game randomly stutters or freezes. #219
+vs-api.voodoo-tech.io
+
+#! 乱七八糟的域名 白名单 End !#
+
+
+#---END---#
