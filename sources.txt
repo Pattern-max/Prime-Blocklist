@@ -4,4 +4,3 @@ https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/fil
 https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_4_Social/filter.txt
 https://secure.fanboy.co.nz/fanboy-annoyance.txt
 https://cats-team.github.io/AdRules/dns.txt
-https://raw.githubusercontent.com/miaoermua/AdguardFilter/main/rule.txt
