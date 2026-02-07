@@ -1,8 +1,8 @@
 [Adblock Plus 2.0]
 ! Title: NetBlocker
 ! Homepage: https://github.com/Pattern-max/NetBlocker
-! Version: 2.55
-! Last modified: 2026-02-07 09:22:06(GMT+0)
+! Version: 2.56
+! Last modified: 2026-02-07 09:22:31(GMT+0)
 ! Description: Aggregated from multiple high-quality blocklist sources.
 ! Total count: 145286
 ! Whitelist entries applied: 0
