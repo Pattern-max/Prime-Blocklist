@@ -1,9 +1,9 @@
-name: Compile List
+name: Compile Optimized NetBlocker
 
 on:
   schedule:
-    - cron: '20 * * * *'
-  workflow_dispatch:
+    - cron: '20 * * * *'  # 每小时第20分钟运行，保持更新频率
+  workflow_dispatch:       # 支持手动触发
 
 jobs:
   build:
@@ -14,172 +14,106 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Update Blocklist with AdGuard Whitelists
+      - name: Setup and Compile
         run: |
           mkdir -p list
           
-          if [ ! -f version.txt ]; then echo "0.00" > version.txt; fi
+          # 初始化版本号文件
+          if [ ! -f version.txt ]; then echo "1.00" > version.txt; fi
           current_version=$(cat version.txt)
-          new_version=$(awk "BEGIN {printf \"%.2f\", $current_version + 0.01}")
-          echo $new_version > version.txt
+          
+          echo "🚀 开始编译 NetBlocker..."
+          echo "当前版本: $current_version"
+          echo "规则源: $(cat sources.txt)"
 
-          echo "Downloading AdGuard whitelists..."
-          curl -s "https://raw.githubusercontent.com/AdguardTeam/AdGuardSDNSFilter/master/Filters/exclusions.txt" -o adguard_exclusions.txt
-          curl -s "https://raw.githubusercontent.com/AdguardTeam/AdGuardSDNSFilter/master/Filters/exceptions.txt" -o adguard_exceptions.txt
-          curl -s "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/BaseFilter/sections/allowlist.txt" -o adguard_base_allowlist.txt
+          # 下载并预处理主规则列表
+          echo "⬇️  下载 AdGuard DNS 主规则列表..."
+          curl -s "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt" | \
+            grep -v -e "^!" -e "^#" -e "^\[" > combined_raw.txt
+          
+          initial_count=$(wc -l < combined_raw.txt | xargs)
+          echo "主规则列表原始条数: $initial_count"
 
-          if [ -f "adguard_exclusions.txt" ]; then
-            echo "Processing AdGuard exclusions..."
-            grep -v -e '^!' -e '^#' adguard_exclusions.txt | \
-                sed 's/[[:space:]]*#.*//' | \
-                sed '/^$/d' | \
-                grep -v -e '\$' -e '\^' -e '\|' | \
-                sed 's/^@@//' | \
-                sed 's/^||//' | \
-                sed 's/\^$//' | \
-                sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | \
-                sed '/^[[:space:]]*$/d' > adguard_exclusions_clean.txt
-          fi
-          
-          if [ -f "adguard_exceptions.txt" ]; then
-            echo "Processing AdGuard exceptions..."
-            grep -v -e '^!' -e '^#' adguard_exceptions.txt | \
-                sed 's/[[:space:]]*#.*//' | \
-                sed '/^$/d' | \
-                grep -v -e '\$' -e '\^' -e '\|' | \
-                sed 's/^@@//' | \
-                sed 's/^||//' | \
-                sed 's/\^$//' | \
-                sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | \
-                sed '/^[[:space:]]*$/d' > adguard_exceptions_clean.txt
-          fi
-          
-          if [ -f "adguard_base_allowlist.txt" ]; then
-            echo "Processing AdGuard BaseFilter allowlist..."
-            grep -v -e '^!' -e '^#' adguard_base_allowlist.txt | \
-                sed 's/[[:space:]]*#.*//' | \
-                sed '/^$/d' | \
-                grep -v -e '\$' -e '\^' -e '\|' | \
-                sed 's/^@@//' | \
-                sed 's/^||//' | \
-                sed 's/\^$//' | \
-                sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | \
-                sed '/^[[:space:]]*$/d' > adguard_base_allowlist_clean.txt
-          fi
-
-          echo "Merging all whitelists..."
-          touch total_whitelist.txt
-          
-          if [ -f "adguard_exclusions_clean.txt" ]; then
-            cat adguard_exclusions_clean.txt >> total_whitelist.txt
-            exclusion_count=$(wc -l < adguard_exclusions_clean.txt | xargs)
-            echo "Added $exclusion_count entries from AdGuard exclusions"
-          fi
-          
-          if [ -f "adguard_exceptions_clean.txt" ]; then
-            cat adguard_exceptions_clean.txt >> total_whitelist.txt
-            exception_count=$(wc -l < adguard_exceptions_clean.txt | xargs)
-            echo "Added $exception_count entries from AdGuard exceptions"
-          fi
-          
-          if [ -f "adguard_base_allowlist_clean.txt" ]; then
-            cat adguard_base_allowlist_clean.txt >> total_whitelist.txt
-            base_allowlist_count=$(wc -l < adguard_base_allowlist_clean.txt | xargs)
-            echo "Added $base_allowlist_count entries from AdGuard BaseFilter allowlist"
-          fi
-          
-          if [ -f "allowlist.txt" ]; then
-            echo "Adding local allowlist..."
+          # 处理本地应急白名单 (如果存在)
+          removed_count=0
+          if [ -f "allowlist.txt" ] && [ -s "allowlist.txt" ]; then
+            echo "🛡️  应用本地应急白名单 (allowlist.txt)..."
+            # 清理白名单文件：移除注释、空格和空行
             sed 's/#.*//' allowlist.txt | \
                 sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | \
-                sed '/^$/d' | \
-                sed '/^[[:space:]]*$/d' >> total_whitelist.txt
-            local_count=$(sed 's/#.*//' allowlist.txt | sed '/^$/d' | sed '/^[[:space:]]*$/d' | wc -l | xargs)
-            echo "Added $local_count entries from local allowlist"
-          fi
-          
-          if [ -s "total_whitelist.txt" ]; then
-            sort -u total_whitelist.txt > total_whitelist_clean.txt
-            total_whitelist_count=$(wc -l < total_whitelist_clean.txt | xargs)
-            echo "Total unique whitelist entries: $total_whitelist_count"
-          else
-            echo "No whitelist entries found"
-            touch total_whitelist_clean.txt
-          fi
-
-          echo "Downloading and processing blocklists..."
-          touch combined_temp.txt
-          while IFS= read -r url || [ -n "$url" ]; do
-            if [ -n "$url" ]; then
-              echo "Downloading $url"
-              curl -s "$url" | grep -v -e "^!" -e "^#" -e "^\[" >> combined_temp.txt
+                sed '/^$/d' > local_whitelist_clean.txt
+            
+            if [ -s "local_whitelist_clean.txt" ]; then
+              local_whitelist_count=$(wc -l < local_whitelist_clean.txt | xargs)
+              echo "本地白名单有效条目: $local_whitelist_count"
+              
+              # 应用白名单，移除被允许的域名
+              grep -vFx -f local_whitelist_clean.txt combined_raw.txt > combined_cleaned.txt
+              
+              final_count=$(wc -l < combined_cleaned.txt | xargs)
+              removed_count=$((initial_count - final_count))
+              echo "通过本地白名单移除条目: $removed_count"
+            else
+              mv combined_raw.txt combined_cleaned.txt
+              echo "ℹ️  本地白名单无有效条目，跳过处理。"
             fi
-          done < sources.txt
-          
-          if [ -f "custom_block_tld.txt" ]; then
-            echo "Adding local custom TLD blocklist..."
-            cat custom_block_tld.txt >> combined_temp.txt
-            local_tld_count=$(wc -l < custom_block_tld.txt | xargs)
-            echo "Added $local_tld_count entries from custom_block_tld.txt"
+            rm -f local_whitelist_clean.txt
           else
-            echo "Local custom TLD blocklist (custom_block_tld.txt) not found, skipping."
-          fi
-          
-          sort -u combined_temp.txt > combined_unsorted.txt
-
-          removed_count=0
-          if [ -s "total_whitelist_clean.txt" ]; then
-            echo "Applying whitelist to blocklist..."
-            initial_count=$(wc -l < combined_unsorted.txt | xargs)
-            
-            grep -vFx -f total_whitelist_clean.txt combined_unsorted.txt > combined_cleaned.txt
-            
-            final_count=$(wc -l < combined_cleaned.txt | xargs)
-            removed_count=$((initial_count - final_count))
-            echo "Removed $removed_count entries via whitelist"
-            
-            if [ $removed_count -gt 0 ]; then
-              echo "Sample of removed domains:"
-              grep -Fx -f total_whitelist_clean.txt combined_unsorted.txt | head -10
-            fi
-          else
-            echo "No whitelist to apply, skipping filter"
-            mv combined_unsorted.txt combined_cleaned.txt
+            mv combined_raw.txt combined_cleaned.txt
+            echo "ℹ️  未找到本地白名单文件，跳过处理。"
           fi
 
+          # 仅在规则数量变化时更新版本
+          final_count=$(wc -l < combined_cleaned.txt | xargs)
+          previous_count=$(grep -oP '! Total count: \K\d+' list/NetBlocker.txt 2>/dev/null || echo "0")
+          
+          if [[ "$final_count" != "$previous_count" ]] || [[ ! -f "list/NetBlocker.txt" ]]; then
+            new_version=$(awk "BEGIN {printf \"%.2f\", $current_version + 0.01}")
+            echo $new_version > version.txt
+            echo "📈 规则数变化 ($previous_count -> $final_count)，版本更新为: $new_version"
+            should_commit=true
+          else
+            echo "📊 规则数未变化 ($final_count)，保持版本: $current_version"
+            should_commit=false
+          fi
+
+          # 生成最终文件头
           echo "[Adblock Plus 2.0]" > header.txt
-          echo "! Title: NetBlocker" >> header.txt
+          echo "! Title: NetBlocker (Optimized)" >> header.txt
           echo "! Homepage: https://github.com/${{ github.repository }}" >> header.txt
-          echo "! Version: $new_version" >> header.txt
-          
-          last_modified=$(date -u +"%Y-%m-%d %H:%M:%S")
-          echo "! Last modified: ${last_modified}(GMT+0)" >> header.txt
-          
-          echo "! Description: Aggregated from multiple high-quality blocklist sources." >> header.txt
-          
-          line_count=$(wc -l < combined_cleaned.txt | xargs)
-          echo "! Total count: $line_count" >> header.txt
-          echo "! Whitelist entries applied: $removed_count" >> header.txt
-          
+          echo "! Version: $(cat version.txt)" >> header.txt
+          echo "! Last modified: $(date -u +"%Y-%m-%d %H:%M:%S") UTC" >> header.txt
+          echo "! Description: Optimized from AdGuard DNS filter. Whitelist issues should be reported upstream." >> header.txt
+          echo "! Total count: $final_count" >> header.txt
+          if [ $removed_count -gt 0 ]; then
+            echo "! Local whitelist entries applied: $removed_count" >> header.txt
+          fi
           echo "" >> header.txt
           
+          # 合并头和规则
           cat header.txt combined_cleaned.txt > list/NetBlocker.txt
           
-          rm -f combined_temp.txt combined_unsorted.txt combined_cleaned.txt header.txt
-          rm -f adguard_exclusions.txt adguard_exceptions.txt adguard_base_allowlist.txt
-          rm -f adguard_exclusions_clean.txt adguard_exceptions_clean.txt adguard_base_allowlist_clean.txt
-          rm -f total_whitelist.txt total_whitelist_clean.txt
+          # 清理临时文件
+          rm -f combined_raw.txt combined_cleaned.txt header.txt
           
-          echo "Compilation complete!"
+          echo "✅ 编译完成！最终规则数: $final_count"
+          if [ "$should_commit" = false ]; then
+            echo "💤 无实质变更，将跳过提交（仅运行空提交以保持活跃）。"
+          fi
 
       - name: Commit and Push
         run: |
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'actions@github.com'
           git add list/NetBlocker.txt version.txt
-          if [[ -n $(git status -s) ]]; then
-            git commit -m "Update NetBlocker.txt to version $(cat version.txt)"
+          
+          # 仅在规则有变化时生成有意义的提交信息
+          if [[ -n $(git status --porcelain list/NetBlocker.txt) ]]; then
+            git commit -m "Update NetBlocker to v$(cat version.txt) [$(date +%Y-%m-%d)]" || echo "无变更可提交"
+            git push
+            echo "🔄 已提交并推送新版本规则。"
           else
-            git commit --allow-empty -m "Scheduled keep-alive commit to maintain repository activity [$(date +%Y-%m-%d)]"
+            git commit --allow-empty -m "Scheduled run, no changes [$(date +%Y-%m-%d)]"
+            git push
+            echo "⏭️  规则无变化，已推送空提交保持仓库活跃。"
           fi
-          git push
