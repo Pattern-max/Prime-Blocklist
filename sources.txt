@@ -1,6 +1,6 @@
-https://github.com/Pattern-max/blocklist-cleaner/raw/gh-pages/hagezi_pro_mini.txt
-https://github.com/Pattern-max/blocklist-cleaner/raw/gh-pages/hagezi_tif_mini.txt
-https://github.com/Pattern-max/blocklist-cleaner/raw/gh-pages/adguard_spyware.txt
-https://github.com/Pattern-max/blocklist-cleaner/raw/gh-pages/adguard_social.txt
-https://github.com/Pattern-max/blocklist-cleaner/raw/gh-pages/fanboy_annoyance.txt
-https://github.com/Pattern-max/blocklist-cleaner/raw/gh-pages/adrules_dns.txt
+https://raw.githubusercontent.com/Pattern-max/blocklist-cleaner/gh-pages/hagezi_pro_mini.txt
+https://raw.githubusercontent.com/Pattern-max/blocklist-cleaner/gh-pages/hagezi_tif_mini.txt
+https://raw.githubusercontent.com/Pattern-max/blocklist-cleaner/gh-pages/adguard_spyware.txt
+https://raw.githubusercontent.com/Pattern-max/blocklist-cleaner/gh-pages/adguard_social.txt
+https://raw.githubusercontent.com/Pattern-max/blocklist-cleaner/gh-pages/fanboy_annoyance.txt
+https://raw.githubusercontent.com/Pattern-max/blocklist-cleaner/gh-pages/adrules_dns.txt
