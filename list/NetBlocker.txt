@@ -1,10 +1,10 @@
 [Adblock Plus 2.0]
 ! Title: NetBlocker
 ! Homepage: https://github.com/Pattern-max/NetBlocker
-! Version: 2.48
-! Last modified: 2026-02-07 08:05:10(GMT+0)
+! Version: 2.49
+! Last modified: 2026-02-07 08:51:44(GMT+0)
 ! Description: Aggregated from multiple high-quality blocklist sources.
-! Total count: 168296
+! Total count: 168293
 ! Whitelist entries applied: 0
 
 
@@ -21436,7 +21436,6 @@ zzzyk.com###Tinfo
 ||ablebodiedpatarchaic.com^
 ||ablecheap.com^
 ||ablefeijoa.top^
-||ablefull.com^
 ||ablehandbookrepugnant.com^
 ||ablelaunchshorts.com^
 ||ablenctionalle.info^
@@ -77318,7 +77317,6 @@ zzzyk.com###Tinfo
 ||guia9.com^
 ||guiacidadeonline.com.br^
 ||guiadohomeoffice.com.br^
-||guid.tpns.sgp.tencent.com^
 ||guidance.ghost.io^
 ||guidanceoffice.info^
 ||guide-ledegr.framer.media^
@@ -140788,7 +140786,6 @@ zzzyk.com###Tinfo
 ||stat.timedg.com^
 ||stat.tld-box.at^
 ||stat.torgen.se^
-||stat.tpns.sgp.tencent.com^
 ||stat.traficom.fi^
 ||stat.ts.cn^
 ||stat.ts.cn^
