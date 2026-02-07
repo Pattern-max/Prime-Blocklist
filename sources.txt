@@ -1,6 +1,6 @@
-https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.mini.txt
-https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/tif.mini.txt
-https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_3_Spyware/filter.txt
-https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_4_Social/filter.txt
-https://secure.fanboy.co.nz/fanboy-annoyance.txt
-https://cats-team.github.io/AdRules/dns.txt
+https://github.com/Pattern-max/blocklist-cleaner/raw/gh-pages/hagezi_pro_mini.txt
+https://github.com/Pattern-max/blocklist-cleaner/raw/gh-pages/hagezi_tif_mini.txt
+https://github.com/Pattern-max/blocklist-cleaner/raw/gh-pages/adguard_spyware.txt
+https://github.com/Pattern-max/blocklist-cleaner/raw/gh-pages/adguard_social.txt
+https://github.com/Pattern-max/blocklist-cleaner/raw/gh-pages/fanboy_annoyance.txt
+https://github.com/Pattern-max/blocklist-cleaner/raw/gh-pages/adrules_dns.txt
