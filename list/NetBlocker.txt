@@ -2,7 +2,7 @@
 ! Title: NetBlocker (Optimized)
 ! Homepage: https://github.com/Pattern-max/NetBlocker
 ! Version: 2.76
-! Last modified: 2026-02-08 22:50:13 UTC
+! Last modified: 2026-02-08 23:49:28 UTC
 ! Description: Optimized from AdGuard DNS filter. Whitelist issues should be reported upstream.
 ! Total count: 145748
 
