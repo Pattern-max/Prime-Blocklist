@@ -1,10 +1,10 @@
 [Adblock Plus 2.0]
 ! Title: NetBlocker (Optimized)
 ! Homepage: https://github.com/Pattern-max/NetBlocker
-! Version: 2.74
-! Last modified: 2026-02-08 19:41:53 UTC
+! Version: 2.75
+! Last modified: 2026-02-08 20:47:43 UTC
 ! Description: Optimized from AdGuard DNS filter. Whitelist issues should be reported upstream.
-! Total count: 145709
+! Total count: 145723
 
 ||dingywearyfortress.com^
 ||garudakrakatau.com^
@@ -8387,6 +8387,7 @@ vkcdnservice.appspot.com^
 ||akgayggphyceu.website^
 ||akgpoauxieivj.space^
 ||akhghskywdfoz.website^
+||akhnpukhasc.com^
 ||akifwyyjyulyj.site^
 ||akilifox.com^
 ||akindlecutaway.click^
@@ -16569,6 +16570,7 @@ vkcdnservice.appspot.com^
 ||disguisesmashdisappearing.com^
 ||disgustingcalm.pro^
 ||disgustingcreative.pro^
+||disgustinghighnesseventually.com^
 ||disgustingmad.com^
 ||dishesha.net^
 ||dishevelledsuccession.com^
@@ -23479,6 +23481,7 @@ vkcdnservice.appspot.com^
 ||halutzyearday.qpon^
 ||halvemanslaughtergild.com^
 ||halvepassionglow.com^
+||halversnizamatloricae.qpon^
 ||hamanharelip.cfd^
 ||hamewanions.qpon^
 ||hamipdnohiesz.site^
@@ -24012,6 +24015,7 @@ vkcdnservice.appspot.com^
 ||hgbn.rocks^
 ||hgbqowuzgonia.website^
 ||hgbqsxuptruuf.website^
+||hgcuvolqqolld.site^
 ||hgdyhumrguyoi.online^
 ||hgesqwfqw.online^
 ||hgfflsrymeivf.site^
@@ -24229,6 +24233,7 @@ vkcdnservice.appspot.com^
 ||hjbhyqvzrveqw.space^
 ||hjbivqvukzswq.website^
 ||hjbqyluyroyoe.website^
+||hjcabozdxphbq.space^
 ||hjcgucgcypvex.store^
 ||hjclprovgorvp.store^
 ||hjcpyuivygenx.rocks^
@@ -24665,6 +24670,7 @@ vkcdnservice.appspot.com^
 ||hpmstr.com^
 ||hpngfzljfnvke.site^
 ||hpnkctxx.buzz^
+||hpowfhyhqgtvg.website^
 ||hppfyrdeuangi.website^
 ||hpplosswaluxl.website^
 ||hpqwvdhg.com^
@@ -38208,6 +38214,7 @@ vkcdnservice.appspot.com^
 ||progiggler.shop^
 ||programmeelaborate.com^
 ||programparkproud.com^
+||prohibitedhesitatetransgress.com^
 ||projectagora.net^
 ||projectagora.tech^
 ||projectagoralibs.com^
@@ -45322,6 +45329,7 @@ vkcdnservice.appspot.com^
 ||sworlowedonhisdh.org^
 ||swornlaughruined.com^
 ||swottedplaidie.com^
+||swrperkeds.com^
 ||swskkgfyhcldxe.net^
 ||swtagnfimnhdt.website^
 ||swungenkotylos.help^
@@ -45438,6 +45446,7 @@ vkcdnservice.appspot.com^
 ||szciifmbhbmcx.space^
 ||szdikxkbkfcwd.store^
 ||szexma.com^
+||szgezbisdrqbf.website^
 ||szhaczzptwovk.club^
 ||szjevtlhcggwu.site^
 ||szlcgeoxvoqzs.online^
@@ -45448,6 +45457,7 @@ vkcdnservice.appspot.com^
 ||szqxvo.com^
 ||szuyezltkzrku.space^
 ||szwrfefyffnaf.space^
+||szwzkummtjbag.online^
 ||t.uc.cn^
 ||t1eflp28b5lowgm6tf2.cfd^
 ||t1g6zmv7lw9k1wfk.cfd^
@@ -46797,6 +46807,7 @@ vkcdnservice.appspot.com^
 ||tqgdovbcivlfu.space^
 ||tqggbkdanotht.space^
 ||tqgiutsmrbbilr.com^
+||tqiokqxjbzryk.site^
 ||tqisbudqqjnif.online^
 ||tqixmouyvssba.online^
 ||tqjzhlpytkfvz.online^
@@ -47244,6 +47255,7 @@ vkcdnservice.appspot.com^
 ||tttcraukuyqff.one^
 ||tttprfmlosbiv.com^
 ||tttrehcqzoguv.online^
+||tttufjyvaczzo.online^
 ||ttudarqrldyoc.site^
 ||ttudkipi.com^
 ||ttusrifbdjqay.online^
@@ -47819,6 +47831,7 @@ vkcdnservice.appspot.com^
 ||uidhhiduhkier.space^
 ||uidpklgzchjnf.website^
 ||uidsync.net^
+||uientdueko.com^
 ||uighnhsbatmdf.store^
 ||uighurbitters.help^
 ||uiigkcqac.xyz^
@@ -52332,6 +52345,7 @@ vkcdnservice.appspot.com^
 ||xtrgqmnflnfnj.buzz^
 ||xtroglobal.com^
 ||xtsbglqvyleeg.website^
+||xtssglwheeuqk.com^
 ||xttaff.com^
 ||xttdpwnnedxsacn.net^
 ||xttdpwnnedxsacn.xyz^
