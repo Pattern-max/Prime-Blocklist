@@ -1,8 +1,8 @@
-name: Compile Optimized NetBlocker
+name: Compile Prime Blocklist
 
 on:
   schedule:
-    - cron: '20 * * * *'  # 每小时第20分钟运行，保持更新频率
+    - cron: '20 * * * *'  # 每小时第20分钟运行
   workflow_dispatch:       # 支持手动触发
 
 jobs:
@@ -22,20 +22,66 @@ jobs:
           if [ ! -f version.txt ]; then echo "1.00" > version.txt; fi
           current_version=$(cat version.txt)
           
-          echo "🚀 开始编译 NetBlocker..."
+          echo "🚀 开始编译 Prime Blocklist..."
           echo "当前版本: $current_version"
-          echo "规则源: $(cat sources.txt)"
-
-          # 下载并预处理主规则列表
-          echo "⬇️  下载 AdGuard DNS 主规则列表..."
-          curl -s "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt" | \
-            grep -v -e "^!" -e "^#" -e "^\[" > combined_raw.txt
+          
+          # 读取规则源
+          echo "📋 使用的规则源:"
+          cat sources.txt
+          echo ""
+          
+          # 下载并合并所有规则源
+          echo "⬇️  下载并合并规则源..."
+          > combined_raw.txt  # 清空文件
+          
+          total_sources=0
+          while IFS= read -r source_url; do
+            if [ -n "$source_url" ]; then
+              total_sources=$((total_sources + 1))
+              echo "正在下载 ($total_sources): $source_url"
+              # 下载规则，移除注释、空行和特殊标记
+              curl -s "$source_url" | \
+                grep -v -e "^!" -e "^#" -e "^\[" -e "^$" -e "^@@" -e "^~" >> combined_raw.txt
+              
+              # 添加延迟避免请求过快
+              sleep 1
+            fi
+          done < sources.txt
+          
+          echo "✅ 已下载 $total_sources 个规则源"
+          
+          # 去重并排序
+          echo "🧹 去重和排序..."
+          sort -u combined_raw.txt > combined_raw_sorted.txt
+          mv combined_raw_sorted.txt combined_raw.txt
           
           initial_count=$(wc -l < combined_raw.txt | xargs)
-          echo "主规则列表原始条数: $initial_count"
-
+          echo "合并后原始规则数: $initial_count"
+          
+          # 下载并应用远程白名单 (filter_45.txt)
+          echo "🛡️  下载并应用远程白名单 (filter_45.txt)..."
+          curl -s "https://adguardteam.github.io/HostlistsRegistry/assets/filter_45.txt" | \
+            grep -v -e "^!" -e "^#" -e "^\[" -e "^$" | \
+            sed 's/^@@//' | sed 's/^~//' > remote_whitelist_raw.txt
+          
+          if [ -s "remote_whitelist_raw.txt" ]; then
+            remote_whitelist_count=$(wc -l < remote_whitelist_raw.txt | xargs)
+            echo "远程白名单有效条目: $remote_whitelist_count"
+            
+            # 应用远程白名单，移除被允许的域名
+            grep -vFx -f remote_whitelist_raw.txt combined_raw.txt > combined_whitelisted.txt
+            
+            remote_removed_count=$((initial_count - $(wc -l < combined_whitelisted.txt | xargs)))
+            echo "通过远程白名单移除条目: $remote_removed_count"
+            
+            mv combined_whitelisted.txt combined_cleaned1.txt
+          else
+            mv combined_raw.txt combined_cleaned1.txt
+            echo "⚠️  远程白名单下载失败或为空，跳过处理"
+          fi
+          
           # 处理本地应急白名单 (如果存在)
-          removed_count=0
+          local_removed_count=0
           if [ -f "allowlist.txt" ] && [ -s "allowlist.txt" ]; then
             echo "🛡️  应用本地应急白名单 (allowlist.txt)..."
             # 清理白名单文件：移除注释、空格和空行
@@ -47,27 +93,48 @@ jobs:
               local_whitelist_count=$(wc -l < local_whitelist_clean.txt | xargs)
               echo "本地白名单有效条目: $local_whitelist_count"
               
-              # 应用白名单，移除被允许的域名
-              grep -vFx -f local_whitelist_clean.txt combined_raw.txt > combined_cleaned.txt
+              # 应用本地白名单，移除被允许的域名
+              grep -vFx -f local_whitelist_clean.txt combined_cleaned1.txt > combined_cleaned.txt
               
-              final_count=$(wc -l < combined_cleaned.txt | xargs)
-              removed_count=$((initial_count - final_count))
-              echo "通过本地白名单移除条目: $removed_count"
+              local_removed_count=$(( $(wc -l < combined_cleaned1.txt | xargs) - $(wc -l < combined_cleaned.txt | xargs) ))
+              echo "通过本地白名单移除条目: $local_removed_count"
             else
-              mv combined_raw.txt combined_cleaned.txt
-              echo "ℹ️  本地白名单无有效条目，跳过处理。"
+              mv combined_cleaned1.txt combined_cleaned.txt
+              echo "ℹ️  本地白名单无有效条目，跳过处理"
             fi
             rm -f local_whitelist_clean.txt
           else
-            mv combined_raw.txt combined_cleaned.txt
-            echo "ℹ️  未找到本地白名单文件，跳过处理。"
+            mv combined_cleaned1.txt combined_cleaned.txt
+            echo "ℹ️  未找到本地白名单文件，跳过处理"
           fi
-
-          # 仅在规则数量变化时更新版本
-          final_count=$(wc -l < combined_cleaned.txt | xargs)
-          previous_count=$(grep -oP '! Total count: \K\d+' list/NetBlocker.txt 2>/dev/null || echo "0")
           
-          if [[ "$final_count" != "$previous_count" ]] || [[ ! -f "list/NetBlocker.txt" ]]; then
+          # 清理临时文件
+          rm -f combined_raw.txt remote_whitelist_raw.txt combined_cleaned1.txt
+
+          # 最终去重
+          echo "🔍 最终去重处理..."
+          sort -u combined_cleaned.txt > combined_final.txt
+          mv combined_final.txt combined_cleaned.txt
+          
+          # 检查规则质量
+          echo "📊 规则质量检查..."
+          final_count=$(wc -l < combined_cleaned.txt | xargs)
+          
+          # 统计各类规则
+          domain_rules=$(grep -c "^||" combined_cleaned.txt || echo "0")
+          ip_rules=$(grep -c "^|" combined_cleaned.txt | grep -v "^||" || echo "0")
+          element_rules=$(grep -c "^##" combined_cleaned.txt || echo "0")
+          
+          echo "📈 最终统计:"
+          echo "   域名规则 (||): $domain_rules"
+          echo "   IP规则 (|): $ip_rules"
+          echo "   元素规则 (##): $element_rules"
+          echo "   总计: $final_count"
+          
+          # 仅在规则数量变化时更新版本
+          previous_count=$(grep -oP '! Total count: \K\d+' list/Prime_Blocklist.txt 2>/dev/null || echo "0")
+          
+          if [[ "$final_count" != "$previous_count" ]] || [[ ! -f "list/Prime_Blocklist.txt" ]]; then
             new_version=$(awk "BEGIN {printf \"%.2f\", $current_version + 0.01}")
             echo $new_version > version.txt
             echo "📈 规则数变化 ($previous_count -> $final_count)，版本更新为: $new_version"
@@ -79,41 +146,57 @@ jobs:
 
           # 生成最终文件头
           echo "[Adblock Plus 2.0]" > header.txt
-          echo "! Title: NetBlocker (Optimized)" >> header.txt
+          echo "! Title: Prime Blocklist (Optimized)" >> header.txt
           echo "! Homepage: https://github.com/${{ github.repository }}" >> header.txt
           echo "! Version: $(cat version.txt)" >> header.txt
           echo "! Last modified: $(date -u +"%Y-%m-%d %H:%M:%S") UTC" >> header.txt
-          echo "! Description: Optimized from AdGuard DNS filter. Whitelist issues should be reported upstream." >> header.txt
+          echo "! Description: Optimized from multiple sources with whitelist applied." >> header.txt
+          echo "! Sources:" >> header.txt
+          while IFS= read -r source_url; do
+            if [ -n "$source_url" ]; then
+              echo "!   - $source_url" >> header.txt
+            fi
+          done < sources.txt
+          echo "! Whitelist: https://adguardteam.github.io/HostlistsRegistry/assets/filter_45.txt" >> header.txt
           echo "! Total count: $final_count" >> header.txt
-          if [ $removed_count -gt 0 ]; then
-            echo "! Local whitelist entries applied: $removed_count" >> header.txt
+          echo "! Domain rules: $domain_rules" >> header.txt
+          echo "! IP rules: $ip_rules" >> header.txt
+          echo "! Element rules: $element_rules" >> header.txt
+          if [ $remote_removed_count -gt 0 ]; then
+            echo "! Remote whitelist entries applied: $remote_removed_count" >> header.txt
+          fi
+          if [ $local_removed_count -gt 0 ]; then
+            echo "! Local whitelist entries applied: $local_removed_count" >> header.txt
           fi
           echo "" >> header.txt
           
           # 合并头和规则
-          cat header.txt combined_cleaned.txt > list/NetBlocker.txt
+          cat header.txt combined_cleaned.txt > list/Prime_Blocklist.txt
           
           # 清理临时文件
-          rm -f combined_raw.txt combined_cleaned.txt header.txt
+          rm -f combined_cleaned.txt header.txt
           
-          echo "✅ 编译完成！最终规则数: $final_count"
+          echo "✅ 编译完成！"
+          echo "📁 输出文件: list/Prime_Blocklist.txt"
+          echo "📏 最终规则数: $final_count"
+          
           if [ "$should_commit" = false ]; then
-            echo "💤 无实质变更，将跳过提交（仅运行空提交以保持活跃）。"
+            echo "💤 无实质变更，将跳过提交（仅运行空提交以保持活跃）"
           fi
 
       - name: Commit and Push
         run: |
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'actions@github.com'
-          git add list/NetBlocker.txt version.txt
+          git add list/Prime_Blocklist.txt version.txt
           
           # 仅在规则有变化时生成有意义的提交信息
-          if [[ -n $(git status --porcelain list/NetBlocker.txt) ]]; then
-            git commit -m "Update NetBlocker to v$(cat version.txt) [$(date +%Y-%m-%d)]" || echo "无变更可提交"
+          if [[ -n $(git status --porcelain list/Prime_Blocklist.txt) ]]; then
+            git commit -m "Update Prime Blocklist to v$(cat version.txt) [$(date +%Y-%m-%d)]" || echo "无变更可提交"
             git push
-            echo "🔄 已提交并推送新版本规则。"
+            echo "🔄 已提交并推送新版本规则"
           else
             git commit --allow-empty -m "Scheduled run, no changes [$(date +%Y-%m-%d)]"
             git push
-            echo "⏭️  规则无变化，已推送空提交保持仓库活跃。"
+            echo "⏭️  规则无变化，已推送空提交保持仓库活跃"
           fi
