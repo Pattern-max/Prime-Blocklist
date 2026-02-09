@@ -1,188 +1,118 @@
+# .github/workflows/list_compiler.yml
 name: Compile Prime Blocklist
 
 on:
   schedule:
-    - cron: '20 * * * *'  # 每小时第20分钟运行
-  workflow_dispatch:       # 支持手动触发
+    - cron: '20 * * * *'
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup and Compile
+      - name: Merge and Compile Lists
         run: |
+          set -e  # 设置错误时立即退出，便于调试
           mkdir -p list
           
-          # 初始化版本号文件
-          if [ ! -f version.txt ]; then echo "1.00" > version.txt; fi
+          # 版本管理初始化
+          [ ! -f version.txt ] && echo "1.00" > version.txt
           current_version=$(cat version.txt)
-          
-          echo "🚀 开始编译 Prime Blocklist..."
-          echo "当前版本: $current_version"
-          
-          # 读取规则源
-          echo "📋 使用的规则源:"
-          cat sources.txt
-          echo ""
-          
-          # 下载并合并所有规则源
-          echo "⬇️  下载并合并规则源..."
-          > combined_raw.txt  # 清空文件
-          
-          total_sources=0
-          while IFS= read -r source_url; do
-            if [ -n "$source_url" ]; then
-              total_sources=$((total_sources + 1))
-              echo "正在下载 ($total_sources): $source_url"
-              # 下载规则，移除注释、空行和特殊标记
-              curl -s "$source_url" | \
-                grep -v -e "^!" -e "^#" -e "^\[" -e "^$" -e "^@@" -e "^~" >> combined_raw.txt
-              
-              # 添加延迟避免请求过快
-              sleep 1
-            fi
-          done < sources.txt
-          
-          echo "✅ 已下载 $total_sources 个规则源"
-          
-          # 去重并排序
-          echo "🧹 去重和排序..."
-          sort -u combined_raw.txt > combined_raw_sorted.txt
-          mv combined_raw_sorted.txt combined_raw.txt
-          
-          initial_count=$(wc -l < combined_raw.txt | xargs)
-          echo "合并后原始规则数: $initial_count"
-          
-          # 下载并应用远程白名单 (filter_45.txt)
-          echo "🛡️  下载并应用远程白名单 (filter_45.txt)..."
-          curl -s "https://adguardteam.github.io/HostlistsRegistry/assets/filter_45.txt" | \
-            grep -v -e "^!" -e "^#" -e "^\[" -e "^$" | \
-            sed 's/^@@//' | sed 's/^~//' > remote_whitelist_raw.txt
-          
-          if [ -s "remote_whitelist_raw.txt" ]; then
-            remote_whitelist_count=$(wc -l < remote_whitelist_raw.txt | xargs)
-            echo "远程白名单有效条目: $remote_whitelist_count"
-            
-            # 应用远程白名单，移除被允许的域名
-            grep -vFx -f remote_whitelist_raw.txt combined_raw.txt > combined_whitelisted.txt
-            
-            remote_removed_count=$((initial_count - $(wc -l < combined_whitelisted.txt | xargs)))
-            echo "通过远程白名单移除条目: $remote_removed_count"
-            
-            mv combined_whitelisted.txt combined_cleaned1.txt
-          else
-            mv combined_raw.txt combined_cleaned1.txt
-            echo "⚠️  远程白名单下载失败或为空，跳过处理"
+
+          echo "🚀 开始编译 Prime Blocklist"
+          echo "=========================================="
+
+          # 1. 下载核心拦截列表 (增加重试和失败检查)
+          echo "⬇️  1. 下载主拦截规则 (pro.plus.txt)..."
+          if ! curl -s --retry 3 "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.plus.txt" -o list_pro.txt || [ ! -s list_pro.txt ]; then
+            echo "❌ 错误: pro.plus.txt 下载失败或为空"
+            exit 1
           fi
+
+          echo "⬇️  2. 下载补充拦截规则 (tif.txt)..."
+          if ! curl -s --retry 3 "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/tif.txt" -o list_tif.txt || [ ! -s list_tif.txt ]; then
+            echo "❌ 错误: tif.txt 下载失败或为空"
+            exit 1
+          fi
+
+          # 2. 合并并预处理拦截规则
+          echo "🧹 3. 预处理规则（移除注释、空行）..."
+          grep -vh -e '^!' -e '^#' -e '^\[' -e '^$' list_pro.txt list_tif.txt > combined_block.txt
+          initial_count=$(sort -u combined_block.txt | wc -l | xargs)
+          echo "   → 合并后唯一拦截规则数: $initial_count"
+
+          # 3. 下载并应用hagezi推荐白名单
+          echo "🛡️  4. 应用hagezi推荐白名单 (whitelist-referral.txt)..."
+          curl -s --retry 3 "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/whitelist-referral.txt" -o whitelist_hagezi.txt
           
-          # 处理本地应急白名单 (如果存在)
+          # 预处理白名单规则：移除注释、空行和“@@”取消阻止标记
+          grep -v -e '^!' -e '^#' -e '^\[' -e '^$' whitelist_hagezi.txt | sed 's/^@@//' > whitelist_clean.txt
+          
+          if [ -s "whitelist_clean.txt" ]; then
+            # 关键修正：grep 选项 -vFf 应合并使用
+            grep -vFf whitelist_clean.txt combined_block.txt > combined_after_hagezi_whitelist.txt
+            mv combined_after_hagezi_whitelist.txt combined_block.txt
+            hagezi_whitelist_count=$(wc -l < whitelist_clean.txt | xargs)
+            echo "   → 已应用hagezi白名单条目: $hagezi_whitelist_count"
+          else
+            echo "   → hagezi白名单为空或处理失败，跳过此步骤"
+          fi
+
+          # 4. 应用本地应急白名单 (allowlist.txt)
           local_removed_count=0
           if [ -f "allowlist.txt" ] && [ -s "allowlist.txt" ]; then
-            echo "🛡️  应用本地应急白名单 (allowlist.txt)..."
-            # 清理白名单文件：移除注释、空格和空行
-            sed 's/#.*//' allowlist.txt | \
-                sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | \
-                sed '/^$/d' > local_whitelist_clean.txt
-            
+            echo "📝 5. 应用本地应急白名单 (allowlist.txt)..."
+            sed 's/#.*//' allowlist.txt | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -v '^$' > local_whitelist_clean.txt
             if [ -s "local_whitelist_clean.txt" ]; then
-              local_whitelist_count=$(wc -l < local_whitelist_clean.txt | xargs)
-              echo "本地白名单有效条目: $local_whitelist_count"
-              
-              # 应用本地白名单，移除被允许的域名
-              grep -vFx -f local_whitelist_clean.txt combined_cleaned1.txt > combined_cleaned.txt
-              
-              local_removed_count=$(( $(wc -l < combined_cleaned1.txt | xargs) - $(wc -l < combined_cleaned.txt | xargs) ))
-              echo "通过本地白名单移除条目: $local_removed_count"
-            else
-              mv combined_cleaned1.txt combined_cleaned.txt
-              echo "ℹ️  本地白名单无有效条目，跳过处理"
+              grep -vFf local_whitelist_clean.txt combined_block.txt > combined_final.txt
+              local_removed_count=$(( $(wc -l < combined_block.txt) - $(wc -l < combined_final.txt) ))
+              mv combined_final.txt combined_block.txt
+              echo "   → 已移除本地白名单条目: $local_removed_count"
             fi
-            rm -f local_whitelist_clean.txt
           else
-            mv combined_cleaned1.txt combined_cleaned.txt
-            echo "ℹ️  未找到本地白名单文件，跳过处理"
+            echo "📝 5. 未找到非空本地白名单，跳过此步骤"
           fi
-          
-          # 清理临时文件
-          rm -f combined_raw.txt remote_whitelist_raw.txt combined_cleaned1.txt
 
-          # 最终去重
-          echo "🔍 最终去重处理..."
-          sort -u combined_cleaned.txt > combined_final.txt
-          mv combined_final.txt combined_cleaned.txt
-          
-          # 检查规则质量
-          echo "📊 规则质量检查..."
-          final_count=$(wc -l < combined_cleaned.txt | xargs)
-          
-          # 统计各类规则
-          domain_rules=$(grep -c "^||" combined_cleaned.txt || echo "0")
-          ip_rules=$(grep -c "^|" combined_cleaned.txt | grep -v "^||" || echo "0")
-          element_rules=$(grep -c "^##" combined_cleaned.txt || echo "0")
-          
-          echo "📈 最终统计:"
-          echo "   域名规则 (||): $domain_rules"
-          echo "   IP规则 (|): $ip_rules"
-          echo "   元素规则 (##): $element_rules"
-          echo "   总计: $final_count"
-          
-          # 仅在规则数量变化时更新版本
+          # 5. 最终去重与统计
+          echo "🔍 6. 最终去重与统计..."
+          sort -u combined_block.txt > final_rules.txt
+          final_count=$(wc -l < final_rules.txt | xargs)
+          echo "   → 最终唯一规则总数: $final_count"
+
+          # 6. 版本管理
           previous_count=$(grep -oP '! Total count: \K\d+' list/Prime_Blocklist.txt 2>/dev/null || echo "0")
-          
           if [[ "$final_count" != "$previous_count" ]] || [[ ! -f "list/Prime_Blocklist.txt" ]]; then
             new_version=$(awk "BEGIN {printf \"%.2f\", $current_version + 0.01}")
-            echo $new_version > version.txt
-            echo "📈 规则数变化 ($previous_count -> $final_count)，版本更新为: $new_version"
+            echo "$new_version" > version.txt
+            echo "📈 版本更新: v$current_version -> v$new_version (规则数: $previous_count -> $final_count)"
             should_commit=true
           else
-            echo "📊 规则数未变化 ($final_count)，保持版本: $current_version"
+            echo "📊 规则数量未变化 ($final_count)，保持版本: v$current_version"
             should_commit=false
           fi
 
-          # 生成最终文件头
-          echo "[Adblock Plus 2.0]" > header.txt
-          echo "! Title: Prime Blocklist (Optimized)" >> header.txt
-          echo "! Homepage: https://github.com/${{ github.repository }}" >> header.txt
-          echo "! Version: $(cat version.txt)" >> header.txt
-          echo "! Last modified: $(date -u +"%Y-%m-%d %H:%M:%S") UTC" >> header.txt
-          echo "! Description: Optimized from multiple sources with whitelist applied." >> header.txt
-          echo "! Sources:" >> header.txt
-          while IFS= read -r source_url; do
-            if [ -n "$source_url" ]; then
-              echo "!   - $source_url" >> header.txt
-            fi
-          done < sources.txt
-          echo "! Whitelist: https://adguardteam.github.io/HostlistsRegistry/assets/filter_45.txt" >> header.txt
-          echo "! Total count: $final_count" >> header.txt
-          echo "! Domain rules: $domain_rules" >> header.txt
-          echo "! IP rules: $ip_rules" >> header.txt
-          echo "! Element rules: $element_rules" >> header.txt
-          if [ $remote_removed_count -gt 0 ]; then
-            echo "! Remote whitelist entries applied: $remote_removed_count" >> header.txt
-          fi
-          if [ $local_removed_count -gt 0 ]; then
-            echo "! Local whitelist entries applied: $local_removed_count" >> header.txt
-          fi
-          echo "" >> header.txt
-          
-          # 合并头和规则
-          cat header.txt combined_cleaned.txt > list/Prime_Blocklist.txt
-          
-          # 清理临时文件
-          rm -f combined_cleaned.txt header.txt
-          
-          echo "✅ 编译完成！"
+          # 7. 生成最终文件（极简头部）
+          {
+            echo "[Adblock Plus 2.0]"
+            echo "! Title: Prime Blocklist"
+            echo "! Version: $(cat version.txt)"
+            echo "! Updated: $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+            echo "! Total count: $final_count"
+            echo ""
+            cat final_rules.txt
+          } > list/Prime_Blocklist.txt
+
+          # 8. 清理与最终报告
+          rm -f list_*.txt combined_block.txt whitelist_*.txt final_rules.txt
+          echo ""
+          echo "✅ Prime Blocklist 编译完成！"
           echo "📁 输出文件: list/Prime_Blocklist.txt"
           echo "📏 最终规则数: $final_count"
-          
-          if [ "$should_commit" = false ]; then
-            echo "💤 无实质变更，将跳过提交（仅运行空提交以保持活跃）"
-          fi
+          [ "$should_commit" = true ] && echo "🔄 检测到变更，将提交新版本" || echo "💤 无变更，将推送空提交"
 
       - name: Commit and Push
         run: |
@@ -190,13 +120,12 @@ jobs:
           git config --global user.email 'actions@github.com'
           git add list/Prime_Blocklist.txt version.txt
           
-          # 仅在规则有变化时生成有意义的提交信息
           if [[ -n $(git status --porcelain list/Prime_Blocklist.txt) ]]; then
-            git commit -m "Update Prime Blocklist to v$(cat version.txt) [$(date +%Y-%m-%d)]" || echo "无变更可提交"
+            git commit -m "Update Prime Blocklist to v$(cat version.txt) [$(date +%Y-%m-%d)]"
             git push
-            echo "🔄 已提交并推送新版本规则"
+            echo "✅ 已提交并推送新版本规则"
           else
             git commit --allow-empty -m "Scheduled run, no changes [$(date +%Y-%m-%d)]"
             git push
-            echo "⏭️  规则无变化，已推送空提交保持仓库活跃"
+            echo "⏭️  规则无变化，已推送空提交保持活跃"
           fi
