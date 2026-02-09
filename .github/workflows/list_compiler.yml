@@ -16,88 +16,116 @@ jobs:
 
       - name: Merge and Compile Lists
         run: |
-          set -e  # 设置错误时立即退出，便于调试
+          set -e
           mkdir -p list
           
-          # 版本管理初始化
+          # 初始化版本
           [ ! -f version.txt ] && echo "1.00" > version.txt
           current_version=$(cat version.txt)
 
           echo "🚀 开始编译 Prime Blocklist"
           echo "=========================================="
+          echo "📋 将读取 sources.txt 中的规则源进行集成"
+          echo "------------------------------------------"
 
-          # 1. 下载核心拦截列表
-          echo "⬇️  1. 下载主拦截规则 (pro.plus.txt)..."
-          if ! curl -s --retry 3 "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.plus.txt" -o list_pro.txt || [ ! -s list_pro.txt ]; then
-            echo "❌ 错误: pro.plus.txt 下载失败或为空"
+          # 1. 检查并读取 sources.txt
+          if [ ! -f "sources.txt" ] || [ ! -s "sources.txt" ]; then
+            echo "❌ 错误: sources.txt 文件不存在或为空"
             exit 1
           fi
 
-          echo "⬇️  2. 下载补充拦截规则 (tif.txt)..."
-          if ! curl -s --retry 3 "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/tif.txt" -o list_tif.txt || [ ! -s list_tif.txt ]; then
-            echo "❌ 错误: tif.txt 下载失败或为空"
-            exit 1
+          # 2. 遍历 sources.txt，下载并合并所有规则源
+          echo "⬇️  开始下载并合并规则源..."
+          > all_raw_rules.txt  # 清空文件，用于收集所有规则
+          source_count=0
+          failed_sources=0
+          
+          while IFS= read -r line || [[ -n "$line" ]]; do
+            # 跳过空行和注释行（以#开头）
+            if [[ -z "$line" ]] || [[ "$line" =~ ^[[:space:]]*# ]]; then
+              continue
+            fi
+            
+            source_count=$((source_count + 1))
+            filename="source_${source_count}.txt"
+            echo "  [$source_count] 下载: $line"
+            
+            # 下载规则源，带重试和错误检查
+            if curl -s --retry 2 --max-time 30 "$line" -o "$filename"; then
+              if [ -s "$filename" ]; then
+                # 预处理：移除注释、空行、头部标记
+                grep -v -e '^!' -e '^#' -e '^\[' -e '^$' "$filename" >> all_raw_rules.txt
+                echo "      → 成功"
+              else
+                echo "      ⚠️  警告: 文件为空，跳过"
+                failed_sources=$((failed_sources + 1))
+              fi
+            else
+              echo "      ❌ 错误: 下载失败，跳过"
+              failed_sources=$((failed_sources + 1))
+            fi
+            # 清理单次下载的临时文件
+            rm -f "$filename"
+            sleep 0.5  # 短暂延迟，避免请求过快
+          done < sources.txt
+          
+          echo "------------------------------------------"
+          echo "✅ 已完成下载。成功: $((source_count - failed_sources))/$source_count 个源"
+          if [ $failed_sources -gt 0 ]; then
+            echo "⚠️  注意: 有 $failed_sources 个源下载失败或为空，可能影响最终规则完整性"
           fi
-
-          # 2. 合并并预处理拦截规则
-          echo "🧹 3. 预处理规则（移除注释、空行）..."
-          grep -vh -e '^!' -e '^#' -e '^\[' -e '^$' list_pro.txt list_tif.txt > combined_block.txt
-          initial_count=$(sort -u combined_block.txt | wc -l | xargs)
+          
+          # 3. 初次合并与去重
+          echo "🧹 初次去重..."
+          sort -u all_raw_rules.txt > combined_block.txt
+          initial_count=$(wc -l < combined_block.txt | xargs)
           echo "   → 合并后唯一拦截规则数: $initial_count"
-
-          # 3. 下载并应用hagezi推荐白名单
-          echo "🛡️  4. 应用hagezi推荐白名单 (whitelist-referral.txt)..."
+          
+          # 4. 下载并应用hagezi推荐白名单
+          echo "🛡️  应用hagezi推荐白名单 (whitelist-referral.txt)..."
           curl -s --retry 3 "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/whitelist-referral.txt" -o whitelist_hagezi.txt
           
-          # 预处理白名单规则：移除注释、空行和"@@"取消阻止标记
           grep -v -e '^!' -e '^#' -e '^\[' -e '^$' whitelist_hagezi.txt | sed 's/^@@//' > whitelist_clean.txt
           
           if [ -s "whitelist_clean.txt" ]; then
-            # 修正：使用正确的grep选项
             grep -vFf whitelist_clean.txt combined_block.txt > combined_after_hagezi_whitelist.txt
             mv combined_after_hagezi_whitelist.txt combined_block.txt
             hagezi_whitelist_count=$(wc -l < whitelist_clean.txt | xargs)
             echo "   → 已应用hagezi白名单条目: $hagezi_whitelist_count"
           else
-            echo "   → hagezi白名单为空或处理失败，跳过此步骤"
+            echo "   → hagezi白名单为空，跳过"
           fi
 
-          # 4. 应用本地应急白名单 (allowlist.txt) - 修复版
+          # 5. 应用本地应急白名单 (allowlist.txt)
           local_removed_count=0
           if [ -f "allowlist.txt" ] && [ -s "allowlist.txt" ]; then
-            echo "📝 5. 应用本地应急白名单 (allowlist.txt)..."
-            # 安全地清理白名单文件
+            echo "📝 应用本地应急白名单 (allowlist.txt)..."
             sed 's/#.*//' allowlist.txt 2>/dev/null | \
               sed 's/^[[:space:]]*//;s/[[:space:]]*$//' 2>/dev/null | \
               grep -v '^$' 2>/dev/null > local_whitelist_clean.txt || true
             
             if [ -s "local_whitelist_clean.txt" ]; then
-              # 应用白名单并统计移除数量
               temp_count_before=$(wc -l < combined_block.txt)
               grep -vFf local_whitelist_clean.txt combined_block.txt > combined_temp.txt
               temp_count_after=$(wc -l < combined_temp.txt)
               local_removed_count=$((temp_count_before - temp_count_after))
-              
-              # 更新combined_block.txt
               mv combined_temp.txt combined_block.txt
-              
               echo "   → 已移除本地白名单条目: $local_removed_count"
             else
-              echo "   → 本地白名单无有效条目，跳过处理"
+              echo "   → 本地白名单无有效条目，跳过"
             fi
-            # 清理临时文件
             rm -f local_whitelist_clean.txt
           else
-            echo "📝 5. 未找到非空本地白名单，跳过此步骤"
+            echo "📝 未找到非空本地白名单，跳过"
           fi
 
-          # 5. 最终去重与统计
-          echo "🔍 6. 最终去重与统计..."
+          # 6. 最终去重与统计
+          echo "🔍 最终去重与统计..."
           sort -u combined_block.txt > final_rules.txt
           final_count=$(wc -l < final_rules.txt | xargs)
           echo "   → 最终唯一规则总数: $final_count"
 
-          # 6. 版本管理
+          # 7. 版本管理
           previous_count=$(grep -oP '! Total count: \K\d+' list/Prime_Blocklist.txt 2>/dev/null || echo "0")
           if [[ "$final_count" != "$previous_count" ]] || [[ ! -f "list/Prime_Blocklist.txt" ]]; then
             new_version=$(awk "BEGIN {printf \"%.2f\", $current_version + 0.01}")
@@ -105,23 +133,23 @@ jobs:
             echo "📈 版本更新: v$current_version -> v$new_version (规则数: $previous_count -> $final_count)"
             should_commit=true
           else
-            echo "📊 规则数量未变化 ($final_count)，保持版本: v$current_version"
+            echo "📊 规则数量未变化，保持版本: v$current_version"
             should_commit=false
           fi
 
-          # 7. 生成最终文件（极简头部）
+          # 8. 生成最终文件
           {
             echo "[Adblock Plus 2.0]"
             echo "! Title: Prime Blocklist"
             echo "! Version: $(cat version.txt)"
-            echo "! Updated: $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+            echo "! Updated: $(date -u +\"%Y-%m-%d %H:%M:%S UTC\")"
             echo "! Total count: $final_count"
             echo ""
             cat final_rules.txt
           } > list/Prime_Blocklist.txt
 
-          # 8. 清理与最终报告
-          rm -f list_*.txt combined_block.txt whitelist_*.txt final_rules.txt
+          # 9. 清理与报告
+          rm -f all_raw_rules.txt combined_block.txt whitelist_*.txt final_rules.txt
           echo ""
           echo "✅ Prime Blocklist 编译完成！"
           echo "📁 输出文件: list/Prime_Blocklist.txt"
