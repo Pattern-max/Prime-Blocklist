@@ -26,7 +26,7 @@ jobs:
           echo "🚀 开始编译 Prime Blocklist"
           echo "=========================================="
 
-          # 1. 下载核心拦截列表 (增加重试和失败检查)
+          # 1. 下载核心拦截列表
           echo "⬇️  1. 下载主拦截规则 (pro.plus.txt)..."
           if ! curl -s --retry 3 "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.plus.txt" -o list_pro.txt || [ ! -s list_pro.txt ]; then
             echo "❌ 错误: pro.plus.txt 下载失败或为空"
@@ -49,11 +49,11 @@ jobs:
           echo "🛡️  4. 应用hagezi推荐白名单 (whitelist-referral.txt)..."
           curl -s --retry 3 "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/whitelist-referral.txt" -o whitelist_hagezi.txt
           
-          # 预处理白名单规则：移除注释、空行和“@@”取消阻止标记
+          # 预处理白名单规则：移除注释、空行和"@@"取消阻止标记
           grep -v -e '^!' -e '^#' -e '^\[' -e '^$' whitelist_hagezi.txt | sed 's/^@@//' > whitelist_clean.txt
           
           if [ -s "whitelist_clean.txt" ]; then
-            # 关键修正：grep 选项 -vFf 应合并使用
+            # 修正：使用正确的grep选项
             grep -vFf whitelist_clean.txt combined_block.txt > combined_after_hagezi_whitelist.txt
             mv combined_after_hagezi_whitelist.txt combined_block.txt
             hagezi_whitelist_count=$(wc -l < whitelist_clean.txt | xargs)
@@ -62,17 +62,31 @@ jobs:
             echo "   → hagezi白名单为空或处理失败，跳过此步骤"
           fi
 
-          # 4. 应用本地应急白名单 (allowlist.txt)
+          # 4. 应用本地应急白名单 (allowlist.txt) - 修复版
           local_removed_count=0
           if [ -f "allowlist.txt" ] && [ -s "allowlist.txt" ]; then
             echo "📝 5. 应用本地应急白名单 (allowlist.txt)..."
-            sed 's/#.*//' allowlist.txt | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -v '^$' > local_whitelist_clean.txt
+            # 安全地清理白名单文件
+            sed 's/#.*//' allowlist.txt 2>/dev/null | \
+              sed 's/^[[:space:]]*//;s/[[:space:]]*$//' 2>/dev/null | \
+              grep -v '^$' 2>/dev/null > local_whitelist_clean.txt || true
+            
             if [ -s "local_whitelist_clean.txt" ]; then
-              grep -vFf local_whitelist_clean.txt combined_block.txt > combined_final.txt
-              local_removed_count=$(( $(wc -l < combined_block.txt) - $(wc -l < combined_final.txt) ))
-              mv combined_final.txt combined_block.txt
+              # 应用白名单并统计移除数量
+              temp_count_before=$(wc -l < combined_block.txt)
+              grep -vFf local_whitelist_clean.txt combined_block.txt > combined_temp.txt
+              temp_count_after=$(wc -l < combined_temp.txt)
+              local_removed_count=$((temp_count_before - temp_count_after))
+              
+              # 更新combined_block.txt
+              mv combined_temp.txt combined_block.txt
+              
               echo "   → 已移除本地白名单条目: $local_removed_count"
+            else
+              echo "   → 本地白名单无有效条目，跳过处理"
             fi
+            # 清理临时文件
+            rm -f local_whitelist_clean.txt
           else
             echo "📝 5. 未找到非空本地白名单，跳过此步骤"
           fi
