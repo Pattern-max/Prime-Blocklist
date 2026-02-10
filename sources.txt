@@ -1,3 +1,2 @@
 https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.mini.txt
 https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/tif.medium.txt
-https://github.com/Pattern-max/NetBlocker/raw/refs/heads/main/allowlist.txt
