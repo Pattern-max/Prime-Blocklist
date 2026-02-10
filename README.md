@@ -30,7 +30,7 @@ The list is automatically updated **every hour** to ensure it stays up-to-date.
 
 **Raw URL:**
 ```
-https://raw.githubusercontent.com/Pattern-max/NetBlocker/refs/heads/main/list/Prime_Blocklist.txt
+https://github.com/Pattern-max/Prime-Blocklist/raw/refs/heads/main/list/Prime_Blocklist.txt
 ```
 
 Add this URL to your Pi-hole, AdGuard Home, or any other DNS blocker.
